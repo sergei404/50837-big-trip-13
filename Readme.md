@@ -1,7 +1,7 @@
 # Проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [сергей бутенко](https://up.htmlacademy.ru/ecmascript/13/user/50837).
-* Наставник: `Неизвестно`.
+* Наставник: `Артур Галимов`.
 
 ---
 
