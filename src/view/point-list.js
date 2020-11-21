@@ -1,0 +1,3 @@
+export const getPointList = () => {
+  return `<ul class="trip-events__list"></ul>`;
+};

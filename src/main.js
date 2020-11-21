@@ -2,27 +2,33 @@ import {createRouteTemplate} from './view/route';
 import {createMenuTemplate} from './view/menu';
 import {createFilterTemplate} from './view/filter';
 import {sortingTaskTemplate} from './view/sorting-task';
-import {getCardList} from './view/card-list';
-import {getCard} from './view/card';
+import {getPointList} from './view/point-list';
+import {getPoint} from './view/point';
 import {getForm} from './view/form';
 import {render} from './utils';
+import {generatePoints} from './mock/point.js';
+import {generateFilters} from './mock/filter.js';
 
-const CARD_COUNT = 3;
+const CARD_COUNT = 22;
+const points = generatePoints(CARD_COUNT);
+const filters = generateFilters();
 
 const tripMainElem = document.querySelector(`.trip-main`);
 const tripControlsElem = tripMainElem.querySelector(`.trip-controls`);
- 
-render(tripMainElem, createRouteTemplate(), `afterbegin`);
-render(tripControlsElem.children[0], createMenuTemplate(), `beforebegin`);
-render(tripControlsElem, createFilterTemplate());
+
+render(tripMainElem, createRouteTemplate(points), `afterbegin`);
+render(tripControlsElem.children[0], createMenuTemplate(), `afterend`);
+render(tripControlsElem, createFilterTemplate(filters));
 
 const tripEventsElem = document.querySelector(`.trip-events`);
 
 render(tripEventsElem, sortingTaskTemplate());
-render(tripEventsElem, getCardList());
+render(tripEventsElem, getForm({}, false));
+render(tripEventsElem, getPointList());
 
-const cardList = tripEventsElem.querySelector(`.trip-events__list`);
-render(cardList, getForm());
-new Array(CARD_COUNT)
-  .fill(` `)
-  .forEach(() => render(cardList, getCard()));
+const listPoints = tripEventsElem.querySelector(`.trip-events__list`);
+
+points.slice().forEach((point) => render(listPoints, getPoint(point)));
+listPoints.children[0].innerHTML = ``;
+render(listPoints.children[0], getForm(points[0], true));
+
