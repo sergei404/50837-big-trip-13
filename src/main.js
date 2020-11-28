@@ -1,10 +1,10 @@
-import {createRouteTemplate} from './view/route';
-import {createMenuTemplate} from './view/menu';
-import {createFilterTemplate} from './view/filter';
-import {sortingTaskTemplate} from './view/sorting-task';
-import {getPointList} from './view/point-list';
-import {getPoint} from './view/point';
-import {getForm} from './view/form';
+import RouteComponent from './view/route';
+import SiteMenuComponent from './view/menu';
+import FilterComponent from './view/filter';
+import SortingPointComponent from './view/sorting-task';
+import PointListComponent from './view/point-list';
+import PointComponent from './view/point';
+import FormComponent from './view/form';
 import {render} from './utils';
 import {generatePoints} from './mock/point.js';
 import {generateFilters} from './mock/filter.js';
@@ -13,22 +13,42 @@ const CARD_COUNT = 22;
 const points = generatePoints(CARD_COUNT);
 const filters = generateFilters();
 
+const renderPoint = (pointListElement, point) => {
+  const pointComponent = new PointComponent(point);
+  const formComponent = new FormComponent(point, true);
+
+  const replacePointToForm = () => {
+    pointListElement.replaceChild(formComponent.getElement(), pointComponent.getElement());
+  };
+
+  const replaceFormToPoint = () => {
+    pointListElement.replaceChild(pointComponent.getElement(), formComponent.getElement());
+  };
+
+  pointComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replacePointToForm();
+  });
+
+  formComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceFormToPoint();
+  });
+
+  render(pointListElement, pointComponent.getElement());
+};
+
 const tripMainElem = document.querySelector(`.trip-main`);
 const tripControlsElem = tripMainElem.querySelector(`.trip-controls`);
 
-render(tripMainElem, createRouteTemplate(points), `afterbegin`);
-render(tripControlsElem.children[0], createMenuTemplate(), `afterend`);
-render(tripControlsElem, createFilterTemplate(filters));
+render(tripMainElem, new RouteComponent(points).getElement(), `afterbegin`);
+render(tripControlsElem.children[0], new SiteMenuComponent().getElement(), `afterend`);
+render(tripControlsElem, new FilterComponent(filters).getElement());
 
 const tripEventsElem = document.querySelector(`.trip-events`);
 
-render(tripEventsElem, sortingTaskTemplate());
-render(tripEventsElem, getForm({}, false));
-render(tripEventsElem, getPointList());
+render(tripEventsElem, new SortingPointComponent().getElement());
+const cardList = new PointListComponent();
+render(tripEventsElem, cardList.getElement());
 
 const listPoints = tripEventsElem.querySelector(`.trip-events__list`);
 
-points.slice().forEach((point) => render(listPoints, getPoint(point)));
-listPoints.children[0].innerHTML = ``;
-render(listPoints.children[0], getForm(points[0], true));
-
+points.slice().forEach((point) => renderPoint(listPoints, point));
