@@ -33,6 +33,11 @@ const renderPoint = (pointListElement, point) => {
     replaceFormToPoint();
   });
 
+  formComponent.getElement().addEventListener(`submit`, (evt) => {
+    evt.preventDefault();
+    replaceFormToPoint();
+  });
+
   render(pointListElement, pointComponent.getElement());
 };
 
