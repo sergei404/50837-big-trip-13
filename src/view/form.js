@@ -1,5 +1,5 @@
 import {towns, otherOptions, types} from '../const.js';
-import {getRandomNumber} from "../utils.js";
+import {getRandomNumber, createElement} from "../utils.js";
 
 const createTypeMarkup = (tipes) => {
   return tipes
@@ -73,12 +73,19 @@ const getDestinationMarkup = ({description, pictures = []}) => {
 </section>`;
 };
 
+const getButtonMarkup = () => {
+  return `<button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>`;
+};
 
-export const getForm = ({date_from: dateFrom, date_to: dateTo, destination = {}, offers: {offers} = {}, type, price} = {}, isDrawn) => {
+
+const getForm = ({date_from: dateFrom, date_to: dateTo, destination = {}, offers: {offers} = {}, type, price} = {}, isDrawn) => {
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(towns);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const destinationMarkup = getDestinationMarkup(destination);
+  const buttonClose = getButtonMarkup();
 
   return `<form class="event event--edit" action="#" method="post">
   <header class="event__header">
@@ -124,6 +131,7 @@ export const getForm = ({date_from: dateFrom, date_to: dateTo, destination = {},
     </div>
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     <button class="event__reset-btn" type="reset">Delete</button>
+    ${isDrawn ? buttonClose : ``}
   </header>
   <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -134,4 +142,28 @@ export const getForm = ({date_from: dateFrom, date_to: dateTo, destination = {},
   </section>
 </form>`;
 };
+
+export default class Form {
+  constructor(point, bool) {
+    this._point = point;
+    this._bool = bool;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getForm(this._point, this._bool);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
 

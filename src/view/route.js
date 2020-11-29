@@ -1,4 +1,6 @@
-export const createRouteTemplate = (points) => {
+import {createElement} from "../utils.js";
+
+const createRouteTemplate = (points) => {
   const towns = new Set(points.slice().map((point) => point.destination.name));
   const data = Object.entries(points.slice().reduce((acc, point) => {
     acc[point.date_from.getDate()] = point.date_from;
@@ -18,3 +20,26 @@ export const createRouteTemplate = (points) => {
     </section>`
   );
 };
+
+export default class Route {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createRouteTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

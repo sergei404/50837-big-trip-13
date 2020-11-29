@@ -1,3 +1,5 @@
+import {formatTime, createElement} from '../utils';
+
 const createOfferMarkup = ({title, price}) => {
   return `
     <li class="event__offer">
@@ -8,7 +10,7 @@ const createOfferMarkup = ({title, price}) => {
   `;
 };
 
-export const getPoint = (point) => {
+const getPoint = (point) => {
   const {date_from: dateFrom, date_to: dateTo, is_favorite: isFavorite, destination, offers: {offers},
     type, price} = point;
   const offersMarkup =
@@ -26,10 +28,10 @@ export const getPoint = (point) => {
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${new Date(dateFrom)
-            .toISOString()}">${dateFrom.getHours()} ${dateFrom.getMinutes()}</time>
+            .toISOString()}">${formatTime(dateFrom)}</time>
             &mdash;
             <time class="event__end-time" datetime="${new Date(dateTo)
-            .toISOString()}">${dateTo.getHours()} ${dateTo.getMinutes()}</time>
+            .toISOString()}">${formatTime(dateTo)}</time>
           </p>
           <p class="event__duration">1H 30M</p>
         </div>
@@ -53,3 +55,27 @@ export const getPoint = (point) => {
     </li>
   `;
 };
+
+export default class Point {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getPoint(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
