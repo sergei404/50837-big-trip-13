@@ -1,5 +1,7 @@
 import {towns, otherOptions, types} from '../const.js';
-import {getRandomNumber, createElement} from "../utils.js";
+import {getRandomNumber} from "../utils/common.js";
+import AbstractView from "./abstract.js";
+import {MIN_PRICE_VALUE, MAX_PRICE_VALUE} from "../mock/point.js";
 
 const createTypeMarkup = (tipes) => {
   return tipes
@@ -20,10 +22,11 @@ const createDatalistTemplate = (sities) => {
 };
 
 const createOffersMarkup = (offers = [], isDrawn) => {
+
   return otherOptions
     .map((option, index) => {
       let title = option;
-      let price = getRandomNumber(5, 70);
+      let price = getRandomNumber(MIN_PRICE_VALUE, MAX_PRICE_VALUE);
       let isActive = false;
       if (offers.length > 0 && isDrawn) {
         offers.forEach((offer) => {
@@ -143,27 +146,36 @@ const getForm = ({date_from: dateFrom, date_to: dateTo, destination = {}, offers
 </form>`;
 };
 
-export default class Form {
+export default class Form extends AbstractView {
   constructor(point, bool) {
+    super();
     this._point = point;
     this._bool = bool;
-    this._element = null;
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
   }
 
   getTemplate() {
     return getForm(this._point, this._bool);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  _formCloseClickHandler() {
+    this._callback.formClick();
+  }
+
+  setCloseFormClickHandler(callback) {
+    this._callback.formClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._formCloseClickHandler);
   }
 }
 

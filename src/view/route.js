@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const getTitleMurkup = (points) => {
   if (points.length) {
@@ -9,7 +9,7 @@ const getTitleMurkup = (points) => {
     }, {}));
 
     return `<h1 class="trip-info__title">${[...towns].join(` &mdash; `)}</h1>
-    <p class="trip-info__dates">${data[0][1].toLocaleString(`en`, {month: `short`})} ${data[0][0].split(` `)[1]}&nbsp;&mdash;&nbsp;${data[0][1].toLocaleString(`en`, {month: `short`}) === data[data.length - 1][1].toLocaleString(`en`, {month: `short`}) ? `` : data[data.length - 1][1].toLocaleString(`en`, {month: `short`})} ${data[data.length - 1][0].split(` `)[1]}</p>`;
+    <p class="trip-info__dates">${data[0][1].toLocaleString(`en`, {month: `short`})} ${data[0][0].split(` `)[1]} &nbsp;&mdash;&nbsp;${data[0][1].toLocaleString(`en`, {month: `short`}) === data[data.length - 1][1].toLocaleString(`en`, {month: `short`}) ? `` : data[data.length - 1][1].toLocaleString(`en`, {month: `short`})} ${data[data.length - 1][0].split(` `)[1]}</p>`;
   }
   return `<h1 class="trip-info__title">Поговаривают Магадишо в это время года просто восхитителен</h1>`;
 };
@@ -30,25 +30,13 @@ const createRouteTemplate = (points) => {
   );
 };
 
-export default class Route {
+export default class Route extends AbstractView {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createRouteTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

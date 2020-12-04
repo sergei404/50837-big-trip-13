@@ -6,7 +6,7 @@ import PointListComponent from './view/point-list';
 import PointComponent from './view/point';
 import FormComponent from './view/form';
 import NoPointComponent from './view/no-points.js';
-import {render} from './utils';
+import {render} from './utils/render.js';
 import {generatePoints} from './mock/point.js';
 import {generateFilters} from './mock/filter.js';
 
@@ -34,18 +34,17 @@ const renderPoint = (pointListElement, point) => {
     }
   };
 
-  pointComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+  pointComponent.setPointClickHandler(() => {
     replacePointToForm();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  formComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+  formComponent.setCloseFormClickHandler(() => {
     replaceFormToPoint();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
 
-  formComponent.getElement().addEventListener(`submit`, (evt) => {
-    evt.preventDefault();
+  formComponent.setFormSubmitHandler(() => {
     replaceFormToPoint();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
