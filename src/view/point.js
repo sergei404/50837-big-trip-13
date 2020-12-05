@@ -1,4 +1,5 @@
-import {formatTime, createElement} from '../utils';
+import {formatTime} from '../utils/task.js';
+import AbstractView from "./abstract.js";
 
 const createOfferMarkup = ({title, price}) => {
   return `
@@ -56,26 +57,24 @@ const getPoint = (point) => {
   `;
 };
 
-export default class Point {
+export default class Point extends AbstractView {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
+    this._pointClickHandler = this._pointClickHandler.bind(this);
   }
 
   getTemplate() {
     return getPoint(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _pointClickHandler() {
+    this._callback.pointClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setPointClickHandler(callback) {
+    this._callback.pointClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._pointClickHandler);
   }
 }
 
