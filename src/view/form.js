@@ -1,7 +1,7 @@
 import {towns, otherOptions, types} from '../const.js';
 import {getRandomNumber} from "../utils/common.js";
 import AbstractView from "./abstract.js";
-import {MIN_PRICE_VALUE, MAX_PRICE_VALUE} from "../mock/point.js";
+import {MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE} from "../mock/point.js";
 
 const createTypeMarkup = (tipes) => {
   return tipes
@@ -26,21 +26,22 @@ const createOffersMarkup = (offers = [], isDrawn) => {
   return otherOptions
     .map((option, index) => {
       let title = option;
-      let price = getRandomNumber(MIN_PRICE_VALUE, MAX_PRICE_VALUE);
+      let price = getRandomNumber(MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE);
       let isActive = false;
+
       if (offers.length > 0 && isDrawn) {
-        offers.forEach((offer) => {
-          if (offer.title === option) {
+        offers.forEach((offer, indexOffer) => {
+          if (index === indexOffer) {
             title = offer.title;
             price = offer.price;
             isActive = true;
           }
         });
       }
-
+      const optionArray = option.split(` `);
       let name = index === 1
-        ? option.split(` `)[option.split(` `).length - 2]
-        : option.split(` `)[option.split(` `).length - 1];
+        ? optionArray[optionArray.length - 2]
+        : optionArray[optionArray.length - 1];
 
       return `<div class="event__available-offers">
       <div class="event__offer-selector">
@@ -62,7 +63,8 @@ const createEventPhotosMarkup = (pictures) => {
     }).join(`\n`);
 };
 
-const getDestinationMarkup = ({description, pictures = []}) => {
+const getDestinationMarkup = (destination) => {
+  const {description, pictures = []} = destination;
   const eventPhotosMarkup = createEventPhotosMarkup(pictures);
 
   return `<section class="event__section  event__section--destination">
@@ -83,7 +85,8 @@ const getButtonMarkup = () => {
 };
 
 
-const getForm = ({date_from: dateFrom, date_to: dateTo, destination = {}, offers: {offers} = {}, type, price} = {}, isDrawn) => {
+const getForm = (point = {}, isDrawn) => {
+  const {date_from: dateFrom, date_to: dateTo, destination = {}, offers: {offers} = {}, type, price} = point;
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(towns);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
@@ -161,7 +164,7 @@ export default class Form extends AbstractView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._point);
   }
 
   setFormSubmitHandler(callback) {

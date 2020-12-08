@@ -13,6 +13,8 @@ const MAX_OFFERS_PRICE_VALUE = 50;
 const MIN_TIME_PERIOD = 1800000;
 const MAX_TIME_PERIOD = 18000000;
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const destination = () => {
   return {
     "description": shuffle(expressions.slice()).slice(0, getRandomNumber(MIN_NUMBER_SENTENCES_DESCRIPTION, MAX_NUMBER_SENTENCES_DESCRIPTION)),
@@ -38,6 +40,7 @@ const generatePoint = () => {
   const type = getRandomArrayItem(types);
   const data = getRandomDate();
   return {
+    "id": generateId(),
     "base_price": getRandomNumber(800, 2000),
     "date_from": new Date(data),
     "date_to": new Date(data + getRandomNumber(MIN_TIME_PERIOD, MAX_TIME_PERIOD)),
@@ -59,4 +62,4 @@ const generatePoints = (count) => {
     .sort((prev, next) => prev.date_from - next.date_from);
 };
 
-export {generatePoint, generatePoints, MIN_PRICE_VALUE, MAX_PRICE_VALUE};
+export {generatePoint, generatePoints, MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE};

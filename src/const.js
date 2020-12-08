@@ -17,4 +17,8 @@ export const types = [
   `Restaurant`,
 ];
 
-
+export const SortType = {
+  DAY: `day`,
+  TIME: `time`,
+  PRICE: `price`
+};
