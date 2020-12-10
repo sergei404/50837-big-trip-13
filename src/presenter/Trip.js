@@ -3,7 +3,7 @@ import PointListComponent from '../view/point-list.js';
 import PointPresenter from "./point.js";
 import NoPointComponent from '../view/no-points.js';
 import {render} from '../utils/render.js';
-import {updateItem} from "../utils/common.js";
+import {updateItem} from '../utils/common.js';
 
 export default class Trip {
   constructor(pointContainer) {
@@ -46,7 +46,7 @@ export default class Trip {
   }
 
   _renderPoints() {
-    this._points.slice().forEach((point) => this._renderPoint(point));
+    this._points.forEach((point) => this._renderPoint(point));
   }
 
   _renderPointsList() {
