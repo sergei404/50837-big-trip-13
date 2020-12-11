@@ -6,9 +6,10 @@ import {MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE} from "../mock/point.js";
 const createTypeMarkup = (tipes) => {
   return tipes
     .map((el) => {
+      const elem = el.toLowerCase();
       return `<div class="event__type-item">
-        <input id="event-type-${el.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${el.toLowerCase()}">
-       <label class="event__type-label  event__type-label--${el.toLowerCase()}" for="event-type-${el.toLowerCase()}-1">${el}</label>
+        <input id="event-type-${elem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${elem}">
+       <label class="event__type-label  event__type-label--${elem}" for="event-type-${elem}-1">${el}</label>
       </div>`;
     }).join(`\n`);
 };

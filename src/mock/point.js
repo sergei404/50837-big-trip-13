@@ -58,8 +58,7 @@ const generatePoint = () => {
 const generatePoints = (count) => {
   return new Array(count)
     .fill(``)
-    .map(generatePoint)
-    .sort((prev, next) => prev.date_from - next.date_from);
+    .map(generatePoint);
 };
 
 export {generatePoint, generatePoints, MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE};
