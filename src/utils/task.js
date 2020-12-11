@@ -8,3 +8,15 @@ export const formatTime = (date) => {
 
   return `${hours}:${minutes}`;
 };
+
+export const sortTime = (prev, next) => {
+  return prev.date_from - next.date_from;
+};
+
+export const sortPrice = (prev, next) => {
+  return next.price - prev.price;
+};
+
+export const sotrDay = (prev, next) => {
+  return new Date(prev[1]) - new Date(next[1]);
+};
