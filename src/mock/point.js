@@ -2,8 +2,7 @@ import {towns, expressions, otherOptions, types} from '../const.js';
 import {getRandomDate, getRandomArrayItem, getRandomNumber, shuffle} from "../utils/common.js";
 const MIN_NUMBER_SENTENCES_DESCRIPTION = 1;
 const MAX_NUMBER_SENTENCES_DESCRIPTION = 3;
-const MIN_COUNT_OFFERS = 0;
-const MAX_COUNT_OFFERS = 5;
+const COUNT_OFFERS = 5;
 const MIN_COUNT_PHOTO = 1;
 const MAX_COUNT_PHOTO = 5;
 const MIN_PRICE_VALUE = 15;
@@ -27,10 +26,11 @@ const destination = () => {
 };
 
 const getOffers = () => {
-  return new Array(getRandomNumber(MIN_COUNT_OFFERS, MAX_COUNT_OFFERS
-  )).fill(` `).map(() => ({
+  return new Array(COUNT_OFFERS)
+  .fill(` `).map(() => ({
     "title": getRandomArrayItem(otherOptions),
-    "price": getRandomNumber(MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE)
+    "price": getRandomNumber(MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE),
+    "isActive": Math.random() > 0.5
   }));
 };
 

@@ -7,7 +7,7 @@ import {generatePoints} from './mock/point.js';
 import {generateFilters} from './mock/filter.js';
 
 const CARD_COUNT = 22;
-const points = generatePoints(CARD_COUNT);
+export const points = generatePoints(CARD_COUNT);
 const filters = generateFilters();
 
 const tripMainElem = document.querySelector(`.trip-main`);
