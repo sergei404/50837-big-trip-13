@@ -41,7 +41,8 @@ const createOffersMarkup = (offers, isDrawn) => {
       </div>`;
     }).join(`\n`);
   }
-  return ``; 
+
+  return ``;
 };
 
 const createEventPhotosMarkup = (pictures) => {
