@@ -3,12 +3,12 @@ import dayjs from 'dayjs';
 
 const createOfferMarkup = ({title, price}) => {
   return `
-    <li class="event__offer">
-      <span class="event__offer-title">${title}</span>
-      &plus;
-      &euro;&nbsp;<span class="event__offer-price">${price}</span>
-    </li>
-  `;
+      <li class="event__offer">
+        <span class="event__offer-title">${title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${price}</span>
+      </li>
+    `;
 };
 
 const getPoint = (point) => {
@@ -21,18 +21,20 @@ const getPoint = (point) => {
     type,
     price
   } = point;
-  const offersMarkup =
-    offers.length !== 0
-      ? offers.map((it) => createOfferMarkup(it)).join(`\n`)
-      : ``;
-  const duration = dayjs(dateTo).diff(dayjs(dateFrom));
+
+  const offersMarkup = offers
+    .filter((offer) => offer.isActive)
+    .map((it) => createOfferMarkup(it)).join(`\n`);
+  const day = dayjs(dateTo).diff(dayjs(dateFrom), `d`);
+  const hours = dayjs(dateTo).diff(dayjs(dateFrom), `h`);
+  const minute = dayjs(dateTo).diff(dayjs(dateFrom), `m`);
 
 
   return `<li class="trip-events__item">
       <div class="event">
         <time class="event__date" datetime="${dateFrom.toISOString()}">${dayjs(dateFrom).format(`MMM D`)}</time>
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
@@ -43,7 +45,7 @@ const getPoint = (point) => {
             <time class="event__end-time" datetime="${new Date(dateTo)
             .toISOString()}">${dayjs(dateTo).format(`hh:mm`)}</time>
           </p>
-          <p class="event__duration">${duration}</p>
+          <p class="event__duration">${day > 0 ? day + `D` : ``} ${hours > 0 ? hours + `H` : ``} ${minute % 60 + `M`}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${price}</span>

@@ -82,8 +82,9 @@ export default class Point {
   }
 
   _escKeyDownHandler(evt) {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
+    if (evt.code === `Escape` || evt.code === `Esc`) {
       evt.preventDefault();
+      this._formComponent.reset(this._point);
       this._replaceFormToPoint();
     }
   }
@@ -93,6 +94,7 @@ export default class Point {
   }
 
   _handleFormClose() {
+    this._formComponent.reset(this._point);
     this._replaceFormToPoint();
   }
 
@@ -108,7 +110,8 @@ export default class Point {
     );
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(point) {
+    this._changeData(point);
     this._replaceFormToPoint();
   }
 }

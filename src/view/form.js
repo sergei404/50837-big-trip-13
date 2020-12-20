@@ -1,7 +1,7 @@
-import {towns, otherOptions, types} from '../const.js';
-import {getRandomNumber} from "../utils/common.js";
-import AbstractView from "./abstract.js";
-import {MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE} from "../mock/point.js";
+import {towns, types} from '../const.js';
+import SmartView from "./smart.js";
+import dayjs from 'dayjs';
+import {points} from '../main.js';
 
 const createTypeMarkup = (tipes) => {
   return tipes
@@ -22,39 +22,27 @@ const createDatalistTemplate = (sities) => {
     });
 };
 
-const createOffersMarkup = (offers = [], isDrawn) => {
-
-  return otherOptions
-    .map((option, index) => {
-      let title = option;
-      let price = getRandomNumber(MIN_OFFERS_PRICE_VALUE, MAX_OFFERS_PRICE_VALUE);
-      let isActive = false;
-
-      if (offers.length > 0 && isDrawn) {
-        offers.forEach((offer, indexOffer) => {
-          if (index === indexOffer) {
-            title = offer.title;
-            price = offer.price;
-            isActive = true;
-          }
-        });
-      }
-      const optionArray = option.split(` `);
-      let name = index === 1
+const createOffersMarkup = (offers, isDrawn) => {
+  if (isDrawn) {
+    return offers.map((offer) => {
+      const optionArray = offer.title.split(` `);
+      let name = offer.title === `Switch to comfort class`
         ? optionArray[optionArray.length - 2]
         : optionArray[optionArray.length - 1];
 
       return `<div class="event__available-offers">
-      <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}"${isActive ? `checked` : ``}>
+        <div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}"${offer.isActive ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${name}-1">
-          <span class="event__offer-title">${title}</span>
+          <span class="event__offer-title">${offer.title}</span>
           &plus;
-          &euro;&nbsp;<span class="event__offer-price">${price}</span>
+          &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
         </label>
       </div>`;
     }).join(`\n`);
+  }
 
+  return ``;
 };
 
 const createEventPhotosMarkup = (pictures) => {
@@ -85,21 +73,23 @@ const getButtonMarkup = () => {
   </button>`;
 };
 
+const getForm = (data) => {
+  const {date_from: dateFrom, date_to: dateTo, destination = {}, offers: {offers} = {}, type, price, isDrawn} = data;
 
-const getForm = (point = {}, isDrawn) => {
-  const {date_from: dateFrom, date_to: dateTo, destination = {}, offers: {offers} = {}, type, price} = point;
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(towns);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const destinationMarkup = getDestinationMarkup(destination);
   const buttonClose = getButtonMarkup();
+  const dateF = dayjs(dateFrom).format(`D/MM/YY hh:m`);
+  const dateT = dayjs(dateTo).format(`D/MM/YY hh:m`);
 
   return `<form class="event event--edit" action="#" method="post">
   <header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
         <span class="visually-hidden">Choose event type</span>
-        <img class="event__type-icon" width="17" height="17" src="img/icons/${isDrawn ? type : `Taxi`}.png" alt="Event type icon">
+        <img class="event__type-icon" width="17" height="17" src="img/icons/${isDrawn ? type.toLowerCase() : `taxi`}.png" alt="Event type icon">
       </label>
       <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
       <div class="event__type-list">
@@ -122,12 +112,12 @@ const getForm = (point = {}, isDrawn) => {
       <label class="visually-hidden" for="event-start-time-1">
         From
       </label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${isDrawn ? dateFrom : ``}">
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${isDrawn ? dateF : ``}">
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">
         To
       </label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${isDrawn ? dateTo : ``}">
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${isDrawn ? dateT : ``}">
     </div>
     <div class="event__field-group  event__field-group--price">
       <label class="event__label" for="event-price-1">
@@ -138,7 +128,7 @@ const getForm = (point = {}, isDrawn) => {
     </div>
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     <button class="event__reset-btn" type="reset">Delete</button>
-    ${isDrawn ? buttonClose : ``}
+    ${buttonClose}
   </header>
   <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -150,27 +140,99 @@ const getForm = (point = {}, isDrawn) => {
 </form>`;
 };
 
-export default class Form extends AbstractView {
-  constructor(point, bool) {
+export default class Form extends SmartView {
+  constructor(point, isDrawn) {
     super();
-    this._point = point;
-    this._bool = bool;
+    this._data = Form.parsePointToData(point, isDrawn);
+
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
+    this._dueTypeToggleHandler = this._dueTypeToggleHandler.bind(this);
+    this._repeatingPlaceholderHandler = this._repeatingPlaceholderHandler.bind(this);
+
+    this._setInnerHandlers();
+  }
+
+  reset(data) {
+    this.updateData(
+        Form.parseDataToPoint(data)
+    );
   }
 
   getTemplate() {
-    return getForm(this._point, this._bool);
+    return getForm(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelector(`.event__type-list`)
+      .addEventListener(`click`, this._dueTypeToggleHandler);
+
+    this.getElement()
+      .querySelector(`.event__input--destination`)
+      .addEventListener(`input`, this._repeatingPlaceholderHandler);
+
+    this.getElement()
+        .querySelector(`.event__rollup-btn`)
+        .addEventListener(`click`, this._formCloseClickHandler);
+  }
+
+  _dueTypeToggleHandler({target}) {
+    const newOffers = points.find((point) => point.type === target.textContent).offers.offers;
+    for (let index = 0; index < newOffers.length; index++) {
+      newOffers[index].isActive = false;
+    }
+    this.updateData({
+      type: target.textContent,
+      offers: {
+        type: target.textContent,
+        offers: newOffers
+      }
+    });
+  }
+
+  _repeatingPlaceholderHandler({target}) {
+    const pointName = points.slice().reduce((acc, data) => {
+      acc[data.destination.name] = data.destination;
+      return acc;
+    }, {});
+
+    this.updateData({
+      destination: {
+        description: pointName[`${target.value}`][`description`],
+        name: target.value,
+        pictures: pointName[`${target.value}`][`pictures`]
+      }
+    });
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._point);
+    this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  static parsePointToData(point, isDrawn) {
+    return Object.assign(
+        {},
+        point,
+        {isDrawn}
+    );
+  }
+
+  static parseDataToPoint(data) {
+    data = Object.assign({}, data);
+
+    return data;
   }
 
   _formCloseClickHandler() {
@@ -182,4 +244,3 @@ export default class Form extends AbstractView {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._formCloseClickHandler);
   }
 }
-
