@@ -94,7 +94,7 @@ export default class Point {
   }
 
   _handleFormClose() {
-    this._formComponent.reset(this._point)
+    this._formComponent.reset(this._point);
     this._replaceFormToPoint();
   }
 

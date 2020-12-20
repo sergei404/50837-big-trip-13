@@ -23,16 +23,15 @@ const createDatalistTemplate = (sities) => {
 };
 
 const createOffersMarkup = (offers, isDrawn) => {
-  return offers
-    .map((offer) => {
-      if (isDrawn) {
-        const optionArray = offer.title.split(` `);
-        let name = offer.title === `Switch to comfort class`
-          ? optionArray[optionArray.length - 2]
-          : optionArray[optionArray.length - 1];
+  if (isDrawn) {
+    return offers.map((offer) => {
+      const optionArray = offer.title.split(` `);
+      let name = offer.title === `Switch to comfort class`
+        ? optionArray[optionArray.length - 2]
+        : optionArray[optionArray.length - 1];
 
       return `<div class="event__available-offers">
-      <div class="event__offer-selector">
+        <div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}"${offer.isActive ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${name}-1">
           <span class="event__offer-title">${offer.title}</span>
@@ -40,7 +39,9 @@ const createOffersMarkup = (offers, isDrawn) => {
           &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
         </label>
       </div>`;
-      }}).join(`\n`);
+    }).join(`\n`);
+  }
+  return ``; 
 };
 
 const createEventPhotosMarkup = (pictures) => {
@@ -175,7 +176,7 @@ export default class Form extends SmartView {
       .querySelector(`.event__input--destination`)
       .addEventListener(`input`, this._repeatingPlaceholderHandler);
 
-      this.getElement()
+    this.getElement()
         .querySelector(`.event__rollup-btn`)
         .addEventListener(`click`, this._formCloseClickHandler);
   }

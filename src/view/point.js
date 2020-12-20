@@ -1,7 +1,7 @@
 import AbstractView from "./abstract.js";
 import dayjs from 'dayjs';
 
-const createOfferMarkup = ({title, price, isActive}) => {
+const createOfferMarkup = ({title, price}) => {
   return `
       <li class="event__offer">
         <span class="event__offer-title">${title}</span>
@@ -23,12 +23,11 @@ const getPoint = (point) => {
   } = point;
 
   const offersMarkup = offers
-    .filter((offer) =>  offer.isActive)
+    .filter((offer) => offer.isActive)
     .map((it) => createOfferMarkup(it)).join(`\n`);
   const day = dayjs(dateTo).diff(dayjs(dateFrom), `d`);
   const hours = dayjs(dateTo).diff(dayjs(dateFrom), `h`);
   const minute = dayjs(dateTo).diff(dayjs(dateFrom), `m`);
-
 
 
   return `<li class="trip-events__item">
