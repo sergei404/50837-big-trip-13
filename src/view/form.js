@@ -2,6 +2,10 @@ import {towns, types} from '../const.js';
 import SmartView from "./smart.js";
 import dayjs from 'dayjs';
 import {points} from '../main.js';
+import flatpickr from "flatpickr";
+
+import "flatpickr/dist/flatpickr.min.css";
+import "flatpickr/dist/themes/dark.css";
 
 const createTypeMarkup = (tipes) => {
   return tipes
@@ -81,8 +85,8 @@ const getForm = (data) => {
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const destinationMarkup = getDestinationMarkup(destination);
   const buttonClose = getButtonMarkup();
-  const dateF = dayjs(dateFrom).format(`D/MM/YY hh:m`);
-  const dateT = dayjs(dateTo).format(`D/MM/YY hh:m`);
+  const dateF = dayjs(dateFrom).format(`D/MM/YY hh:mm`);
+  const dateT = dayjs(dateTo).format(`D/MM/YY hh:mm`);
 
   return `<form class="event event--edit" action="#" method="post">
   <header class="event__header">
@@ -144,14 +148,31 @@ export default class Form extends SmartView {
   constructor(point, isDrawn) {
     super();
     this._data = Form.parsePointToData(point, isDrawn);
+    this._datepickerFrom = null;
+    this._datepickerTo = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formCloseClickHandler = this._formCloseClickHandler.bind(this);
+
+    this._dueFromDateChangeHandler = this._dueFromDateChangeHandler.bind(this);
+    this._dueToDateChangeHandler = this._dueToDateChangeHandler.bind(this);
+
     this._dueTypeToggleHandler = this._dueTypeToggleHandler.bind(this);
     this._repeatingPlaceholderHandler = this._repeatingPlaceholderHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setFromDatepicker();
+    this._setToDatepicker();
   }
+
+  // removeElement() {
+  //   super.removeElement();
+
+  //   if (this._datepicker) {
+  //     this._datepicker.destroy();
+  //     this._datepicker = null;
+  //   }
+  // }
 
   reset(data) {
     this.updateData(
@@ -165,7 +186,51 @@ export default class Form extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setFromDatepicker();
+    this._setToDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  _setFromDatepicker() {
+    if (this._datepickerFrom) {
+      this._datepickerFrom.destroy();
+      this._datepickerFrom = null;
+    }
+
+    if (this._data.date_from) {
+      this._datepickerFrom = flatpickr(
+          this.getElement().querySelector(`[name = "event-start-time"]`),
+          {
+            "dateFormat": `d/m/y H:i`,
+            "defaultDate": this._data.date_from,
+            "enableTime": true,
+            "time_24hr": true,
+            "onChange": this._dueFromDateChangeHandler
+          }
+      );
+    }
+  }
+
+  _setToDatepicker() {
+    if (this._datepickerTo) {
+      this._datepickerTo.destroy();
+      this._datepickerTo = null;
+    }
+
+    if (this._data.date_to) {
+      this._datepickerTo = flatpickr(
+          //this.getElement().querySelectorAll(`[name = "event-end-time"]`),
+          this.getElement().querySelectorAll(`#event-end-time-1`),
+          {
+            "dateFormat": `d/m/y H:i`,
+            "defaultDate": this._data.date_to,
+            "minDate": this._data.date_from,
+            "enableTime": true,
+            "time_24hr": true,
+            "onChange": this._dueToDateChangeHandler
+          }
+      );
+    }
   }
 
   _setInnerHandlers() {
@@ -180,6 +245,19 @@ export default class Form extends SmartView {
     this.getElement()
         .querySelector(`.event__rollup-btn`)
         .addEventListener(`click`, this._formCloseClickHandler);
+  }
+
+  _dueFromDateChangeHandler([userDateFrom]) {
+    console.log(userDateFrom);
+    this.updateData({
+      "data_from": userDateFrom
+    });
+  }
+
+  _dueToDateChangeHandler([userDateTo]) {
+    this.updateData({
+      "data_to": userDateTo
+    });
   }
 
   _dueTypeToggleHandler({target}) {
