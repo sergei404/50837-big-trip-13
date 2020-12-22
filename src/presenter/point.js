@@ -58,7 +58,7 @@ export default class Point {
     }
   }
 
-  _replacePointToForm() { 
+  _replacePointToForm() {
     this._formComponent = new FormComponent(this._point, true);
 
     this._formComponent.setCloseFormClickHandler(this._handleFormClose);
