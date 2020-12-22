@@ -29,18 +29,13 @@ export default class Point {
     this._point = point;
 
     const prevPointComponent = this._pointComponent;
-    const prevFormComponent = this._formComponent;
 
     this._pointComponent = new PointComponent(point);
-    this._formComponent = new FormComponent(point, true);
 
     this._pointComponent.setPointClickHandler(this._handlePointClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._formComponent.setCloseFormClickHandler(this._handleFormClose);
-    this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
-
-    if (prevPointComponent === null || prevFormComponent === null) {
+    if (prevPointComponent === null) {
       render(this._pointListContainer, this._pointComponent);
       return;
     }
@@ -49,12 +44,7 @@ export default class Point {
       replace(this._pointComponent, prevPointComponent);
     }
 
-    if (this._mode === Mode.FORM) {
-      replace(this._formComponent, prevFormComponent);
-    }
-
     remove(prevPointComponent);
-    remove(prevFormComponent);
   }
 
   destroy() {
@@ -68,8 +58,14 @@ export default class Point {
     }
   }
 
-  _replacePointToForm() {
+  _replacePointToForm() { c
+    this._formComponent = new FormComponent(this._point, true);
+
+    this._formComponent.setCloseFormClickHandler(this._handleFormClose);
+    this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
+
     replace(this._formComponent, this._pointComponent);
+
     document.addEventListener(`keydown`, this._escKeyDownHandler);
     this._changeMode();
     this._mode = Mode.FORM;
@@ -86,6 +82,7 @@ export default class Point {
       evt.preventDefault();
       this._formComponent.reset(this._point);
       this._replaceFormToPoint();
+      this._formComponent.removeElement();
     }
   }
 
@@ -96,6 +93,7 @@ export default class Point {
   _handleFormClose() {
     this._formComponent.reset(this._point);
     this._replaceFormToPoint();
+    this._formComponent.removeElement();
   }
 
   _handleFavoriteClick() {

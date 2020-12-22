@@ -165,14 +165,19 @@ export default class Form extends SmartView {
     this._setToDatepicker();
   }
 
-  // removeElement() {
-  //   super.removeElement();
+  removeElement() {
+    super.removeElement();
 
-  //   if (this._datepicker) {
-  //     this._datepicker.destroy();
-  //     this._datepicker = null;
-  //   }
-  // }
+    if (this._datepickerFrom) {
+      this._datepickerFrom.destroy();
+      this._datepickerFrom = null;
+    }
+
+    if (this._datepickerTo) {
+      this._datepickerTo.destroy();
+      this._datepickerTo = null;
+    }
+  }
 
   reset(data) {
     this.updateData(
@@ -199,7 +204,7 @@ export default class Form extends SmartView {
 
     if (this._data.date_from) {
       this._datepickerFrom = flatpickr(
-          this.getElement().querySelector(`[name = "event-start-time"]`),
+          this.getElement().querySelectorAll(`#event-start-time-1`),
           {
             "dateFormat": `d/m/y H:i`,
             "defaultDate": this._data.date_from,
@@ -219,7 +224,6 @@ export default class Form extends SmartView {
 
     if (this._data.date_to) {
       this._datepickerTo = flatpickr(
-          //this.getElement().querySelectorAll(`[name = "event-end-time"]`),
           this.getElement().querySelectorAll(`#event-end-time-1`),
           {
             "dateFormat": `d/m/y H:i`,
@@ -248,15 +252,14 @@ export default class Form extends SmartView {
   }
 
   _dueFromDateChangeHandler([userDateFrom]) {
-    console.log(userDateFrom);
     this.updateData({
-      "data_from": userDateFrom
+      "date_from": userDateFrom
     });
   }
 
   _dueToDateChangeHandler([userDateTo]) {
     this.updateData({
-      "data_to": userDateTo
+      "date_to": userDateTo
     });
   }
 
@@ -292,6 +295,7 @@ export default class Form extends SmartView {
   _formSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.formSubmit(Form.parsePointToData(this._data));
+    this.removeElement();
   }
 
   setFormSubmitHandler(callback) {
@@ -315,6 +319,7 @@ export default class Form extends SmartView {
 
   _formCloseClickHandler() {
     this._callback.formClick();
+    this.removeElement();
   }
 
   setCloseFormClickHandler(callback) {

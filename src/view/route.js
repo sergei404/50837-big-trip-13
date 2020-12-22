@@ -8,7 +8,7 @@ const getTitleMurkup = (points) => {
       const key = `${point.date_from.getMonth() + 1} ${point.date_from.getDate()}`;
       acc[key] = point.date_from;
       return acc;
-    }, {})).sort((prev, next) => prev[1] - next[1])
+    }, {})).sort((prev, next) => prev[1] - next[1]);
 
     const dateStart = data[0];
     const dateEnd = data[data.length - 1];
