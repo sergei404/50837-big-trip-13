@@ -1,6 +1,7 @@
 import PointComponent from '../view/point.js';
 import FormComponent from '../view/form.js';
 import {render, replace, remove} from "../utils/render.js";
+import {UserAction, UpdateType} from "../const.js";
 
 const Mode = {
   POINT: `POINT`,
@@ -49,7 +50,7 @@ export default class Point {
 
   destroy() {
     remove(this._pointComponent);
-    remove(this._formComponent);
+    // remove(this._formComponent);
   }
 
   resetView() {
@@ -86,6 +87,15 @@ export default class Point {
     }
   }
 
+  _handleFormSubmit(point) {
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point
+    );
+    this._replaceFormToPoint();
+  }
+
   _handlePointClick() {
     this._replacePointToForm();
   }
@@ -98,18 +108,15 @@ export default class Point {
 
   _handleFavoriteClick() {
     this._changeData(
-        Object.assign(
-            {},
-            this._point,
-            {
-              "is_favorite": !this._point[`is_favorite`]
-            }
-        )
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      Object.assign(
+          {},
+          this._point,
+          {
+            "is_favorite": !this._point[`is_favorite`]
+          }
+      )
     );
-  }
-
-  _handleFormSubmit(point) {
-    this._changeData(point);
-    this._replaceFormToPoint();
   }
 }

@@ -265,9 +265,11 @@ export default class Form extends SmartView {
 
   _dueTypeToggleHandler({target}) {
     const newOffers = points.find((point) => point.type === target.textContent).offers.offers;
-    for (let index = 0; index < newOffers.length; index++) {
-      newOffers[index].isActive = false;
+
+    for (const offer of newOffers) {
+      offer.isActive = false;
     }
+
     this.updateData({
       type: target.textContent,
       offers: {
