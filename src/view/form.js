@@ -159,6 +159,7 @@ export default class Form extends SmartView {
 
     this._dueTypeToggleHandler = this._dueTypeToggleHandler.bind(this);
     this._repeatingPlaceholderHandler = this._repeatingPlaceholderHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setFromDatepicker();
@@ -255,6 +256,16 @@ export default class Form extends SmartView {
     this.updateData({
       "date_from": userDateFrom
     });
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(Form.parseDataToPoint(this._data));
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
   _dueToDateChangeHandler([userDateTo]) {

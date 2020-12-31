@@ -20,6 +20,7 @@ export default class Point {
 
     this._handlePointClick = this._handlePointClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._handleFormClose = this._handleFormClose.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
 
@@ -64,6 +65,7 @@ export default class Point {
 
     this._formComponent.setCloseFormClickHandler(this._handleFormClose);
     this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._formComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     replace(this._formComponent, this._pointComponent);
 
@@ -90,7 +92,7 @@ export default class Point {
   _handleFormSubmit(point) {
     this._changeData(
       UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
+      UpdateType.PATCH,
       point
     );
     this._replaceFormToPoint();
@@ -117,6 +119,14 @@ export default class Point {
             "is_favorite": !this._point[`is_favorite`]
           }
       )
+    );
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(
+        UserAction.DELETE_POINT,
+        UpdateType.MINOR,
+        point
     );
   }
 }
