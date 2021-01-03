@@ -51,7 +51,9 @@ export default class Point {
 
   destroy() {
     remove(this._pointComponent);
-    // remove(this._formComponent);
+    if (this._formComponent) {
+      remove(this._formComponent);
+    }
   }
 
   resetView() {
@@ -91,9 +93,9 @@ export default class Point {
 
   _handleFormSubmit(point) {
     this._changeData(
-      UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
-      point
+        UserAction.UPDATE_POINT,
+        UpdateType.PATCH,
+        point
     );
     this._replaceFormToPoint();
   }
@@ -110,15 +112,15 @@ export default class Point {
 
   _handleFavoriteClick() {
     this._changeData(
-      UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
-      Object.assign(
-          {},
-          this._point,
-          {
-            "is_favorite": !this._point[`is_favorite`]
-          }
-      )
+        UserAction.UPDATE_POINT,
+        UpdateType.MINOR,
+        Object.assign(
+            {},
+            this._point,
+            {
+              "is_favorite": !this._point[`is_favorite`]
+            }
+        )
     );
   }
 

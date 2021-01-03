@@ -12,7 +12,8 @@ const MAX_OFFERS_PRICE_VALUE = 50;
 const MIN_TIME_PERIOD = 1800000;
 const MAX_TIME_PERIOD = 18000000;
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+// const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const destination = () => {
   return {
