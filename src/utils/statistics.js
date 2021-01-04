@@ -4,10 +4,10 @@ import {types} from "../const.js";
 const divideCostsByTypes = (points) => {
   return [...new Set(points.map((point) => point.type))]
     .map((type) => {
-        const eventsByType = points.filter((point) => point.type === type);
-        const sum = eventsByType.reduce((acc, val) => ({price: acc.price + val.price}));
-        return [type, sum.price];
-      })
+      const eventsByType = points.filter((point) => point.type === type);
+      const sum = eventsByType.reduce((acc, val) => ({price: acc.price + val.price}));
+      return [type, sum.price];
+    })
       .sort(([, priceA], [, priceB]) => priceB - priceA);
 };
 

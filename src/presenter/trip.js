@@ -5,7 +5,7 @@ import NoPointComponent from '../view/no-points.js';
 import PointNewPresenter from "./new-point.js";
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {sotrDays, sortTime, sortPrice} from '../utils/task.js';
-import {SortType, UpdateType, UserAction, FilterType} from "../const.js";
+import {SortType, UpdateType, UserAction} from "../const.js";
 import {filter} from "../utils/filter.js";
 
 export default class Trip {
@@ -48,8 +48,6 @@ export default class Trip {
   }
 
   createPoint(callback) {
-    // this._currentSortType = SortType.DAY;
-    // this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._pointNewPresenter.init(callback);
   }
 
