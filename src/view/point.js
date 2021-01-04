@@ -32,18 +32,17 @@ const getPoint = (point) => {
 
   return `<li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom.toISOString()}">${dayjs(dateFrom).format(`MMM D`)}</time>
+        <time class="event__date" datetime="${dateFrom}">${dayjs(dateFrom).format(`MMM D`)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${new Date(dateFrom)
-            .toISOString()}">${dayjs(dateFrom).format(`hh:mm`)}</time>
+            <time class="event__start-time" datetime="${new Date(dateFrom)}">${dayjs(dateFrom).format(`hh:mm`)}</time>
             &mdash;
             <time class="event__end-time" datetime="${new Date(dateTo)
-            .toISOString()}">${dayjs(dateTo).format(`hh:mm`)}</time>
+}">${dayjs(dateTo).format(`hh:mm`)}</time>
           </p>
           <p class="event__duration">${day > 0 ? day + `D` : ``} ${hours > 0 ? hours + `H` : ``} ${minute % 60 + `M`}</p>
         </div>
