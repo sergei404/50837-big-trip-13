@@ -38,8 +38,8 @@ const createDatalistTemplate = (sities) => {
     });
 };
 
-const createOffersMarkup = (offers, isDisabled) => {
-  if (isDisabled) {
+const createOffersMarkup = (offers, isDrawn) => {
+  if (isDrawn) {
     return offers.map((offer) => {
       const optionArray = offer.title.split(` `);
       let name = offer.title === `Switch to comfort class`
@@ -56,7 +56,6 @@ const createOffersMarkup = (offers, isDisabled) => {
         </div>`;
     }).join(`\n`);
   }
-
   return ``;
 };
 
@@ -84,15 +83,15 @@ const getDestinationMarkup = (destination) => {
 
 const getButtonMarkup = () => {
   return `<button class="event__rollup-btn" type="button">
-    <span class="visually-hidden">Open event</span>
-  </button>`;
+      <span class="visually-hidden">Open event</span>
+    </button>`;
 };
 
 const getFormTemplate = (data) => {
   const {date_from: dateFrom, date_to: dateTo, destination, offers: {offers}, isDrawn, type, price, isDisabled} = data;
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(towns);
-  const offersMarkup = createOffersMarkup(offers, isDisabled);
+  const offersMarkup = createOffersMarkup(offers, isDrawn);
   const buttonMarkup = getButtonMarkup();
   const destinationMarkup = getDestinationMarkup(destination);
 
@@ -103,7 +102,7 @@ const getFormTemplate = (data) => {
         <span class="visually-hidden">Choose event type</span>
         <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </label>
-      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
+      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Transfer</legend>
@@ -140,7 +139,7 @@ const getFormTemplate = (data) => {
     </div>
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     <button class="event__reset-btn" type="reset">Delete</button>
-    ${isDrawn ? buttonMarkup : ``}
+    ${isDrawn && !isDisabled ? buttonMarkup : ``}
   </header>
   <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -303,6 +302,7 @@ export default class Form extends SmartView {
         type: target.value,
         offers: newOffers
       },
+      isDrawn: true,
       isDisabled: true
     });
   }
@@ -377,7 +377,7 @@ export default class Form extends SmartView {
 
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
-
+    delete data.isDisabled;
     return data;
   }
 
