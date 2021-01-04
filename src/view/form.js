@@ -38,8 +38,8 @@ const createDatalistTemplate = (sities) => {
     });
 };
 
-const createOffersMarkup = (offers, isDrawn) => {
-  if (isDrawn) {
+const createOffersMarkup = (offers, isDisabled) => {
+  if (isDisabled) {
     return offers.map((offer) => {
       const optionArray = offer.title.split(` `);
       let name = offer.title === `Switch to comfort class`
@@ -89,10 +89,10 @@ const getButtonMarkup = () => {
 };
 
 const getFormTemplate = (data) => {
-  const {date_from: dateFrom, date_to: dateTo, destination, offers: {offers}, isDrawn, type, price} = data;
+  const {date_from: dateFrom, date_to: dateTo, destination, offers: {offers}, isDrawn, type, price, isDisabled} = data;
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(towns);
-  const offersMarkup = createOffersMarkup(offers, isDrawn);
+  const offersMarkup = createOffersMarkup(offers, isDisabled);
   const buttonMarkup = getButtonMarkup();
   const destinationMarkup = getDestinationMarkup(destination);
 
@@ -103,7 +103,7 @@ const getFormTemplate = (data) => {
         <span class="visually-hidden">Choose event type</span>
         <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </label>
-      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Transfer</legend>
@@ -155,9 +155,9 @@ const getFormTemplate = (data) => {
 };
 
 export default class Form extends SmartView {
-  constructor(point = BLANK_EVENT, isDrawn = false) {
+  constructor(point = BLANK_EVENT, isDrawn = false, isDisabled) {
     super();
-    this._data = Form.parsePointToData(point, isDrawn);
+    this._data = Form.parsePointToData(point, isDrawn, isDisabled);
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
@@ -303,7 +303,7 @@ export default class Form extends SmartView {
         type: target.value,
         offers: newOffers
       },
-      isDrawn: true
+      isDisabled: true
     });
   }
 
@@ -370,6 +370,7 @@ export default class Form extends SmartView {
         point,
         {
           isDrawn,
+          isDisabled: false,
         }
     );
   }
