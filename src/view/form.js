@@ -1,5 +1,5 @@
 import {towns, types} from '../const.js';
-import {getOffers} from '../utils/common.js'
+import {getOffers} from '../utils/common.js';
 import SmartView from "./smart.js";
 import {points} from '../main.js';
 import dayjs from 'dayjs';
@@ -98,7 +98,7 @@ const getFormTemplate = (data) => {
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const buttonMarkup = getButtonMarkup();
   const destinationMarkup = getDestinationMarkup(destination);
-  console.log(data);
+
   return `<form class="event event--edit" action="#" method="post">
   <header class="event__header">
     <div class="event__type-wrapper">
@@ -349,7 +349,7 @@ export default class Form extends SmartView {
       offers: {
         offers: getOffers(points, BLANK_EVENT.type)
       }
-    })
+    });
 
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
