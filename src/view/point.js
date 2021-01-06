@@ -17,7 +17,7 @@ const getPoint = (point) => {
     date_to: dateTo,
     is_favorite: isFavorite,
     destination,
-    offers: {offers},
+    offers: {offers = []},
     type,
     price
   } = point;
