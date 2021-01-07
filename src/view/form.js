@@ -1,4 +1,5 @@
 import {towns, types} from '../const.js';
+import {getOffers} from '../utils/common.js';
 import SmartView from "./smart.js";
 import {points} from '../main.js';
 import dayjs from 'dayjs';
@@ -17,7 +18,10 @@ const BLANK_EVENT = {
   "date_from": new Date(),
   "date_to": new Date(),
   "price": ``,
-  "offers": [],
+  "offers": {
+    "type": `flight`,
+    "offers": []
+  },
 };
 
 const createTypeMarkup = (tipes) => {
@@ -145,7 +149,7 @@ const getFormTemplate = (data) => {
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offersMarkup}
+        ${offersMarkup }
       </div>
     </section>
     ${destinationMarkup}
@@ -291,16 +295,11 @@ export default class Form extends SmartView {
 
 
   _dueTypeToggleHandler({target}) {
-    const newOffers = points.slice().find((point) => point.type.toLowerCase() === target.value).offers.offers;
-
-    for (const offer of newOffers) {
-      offer.isActive = false;
-    }
     this.updateData({
       type: target.value,
       offers: {
         type: target.value,
-        offers: newOffers
+        offers: getOffers(points, target.value)
       },
       isDrawn: true,
       isDisabled: true
@@ -346,6 +345,12 @@ export default class Form extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
+    this.updateData({
+      offers: {
+        offers: getOffers(points, BLANK_EVENT.type)
+      }
+    });
+
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 

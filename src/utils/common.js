@@ -25,16 +25,13 @@ export function shuffle(arr) {
   return arr;
 }
 
-// export const updateItem = (points, update) => {
-//   const index = points.findIndex((point) => point.id === update.id);
+export function getOffers(points, type) {
+  const newOffers = points.slice().find((point) => point.type.toLowerCase() === type).offers.offers;
 
-//   if (index === -1) {
-//     return points;
-//   }
+  for (const offer of newOffers) {
+    offer.isActive = false;
+  }
 
-//   return [
-//     ...points.slice(0, index),
-//     update,
-//     ...points.slice(index + 1)
-//   ];
-// };
+  return newOffers;
+}
+
