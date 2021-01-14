@@ -37,6 +37,7 @@ const createRouteTemplate = (points) => {
 
 export default class Route extends AbstractView {
   constructor(points) {
+    console.log(points);
     super();
     this._points = points;
   }

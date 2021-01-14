@@ -10,13 +10,13 @@ export const formatTime = (date) => {
 };
 
 export const sortTime = (prev, next) => {
-  return (prev.date_to - prev.date_from) - (next.date_to - next.date_from);
+  return (new Date(next.dateTo) - new Date(next.dateFrom)) - (new Date(prev.dateTo) - new Date(prev.dateFrom));
 };
 
 export const sortPrice = (prev, next) => {
-  return next.price - prev.price;
+  return next.basePrice - prev.basePrice;
 };
 
 export const sotrDays = (prev, next) => {
-  return prev.date_from - next.date_from;
+  return prev.dateFrom - next.dateFrom;
 };

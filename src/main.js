@@ -6,29 +6,36 @@ import PointsModel from "./model/points.js";
 import FilterModel from "./model/filter.js";
 import StatisticsComponent from "./view/statistics.js";
 import {render, RenderPosition, remove} from './utils/render.js';
-import {generatePoints} from './mock/point.js';
 import {MenuItem, UpdateType, FilterType} from "./const.js";
+import Api from "./api.js";
 
-const CARD_COUNT = 22;
-export const points = generatePoints(CARD_COUNT);
-
-const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
-
-const filterModel = new FilterModel();
+const AUTHORIZATION = `Basic TjDpyVBdy4dKt9wFzG8Q9By`;
+const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const tripMainElem = document.querySelector(`.trip-main`);
 const headerControlsElem = tripMainElem.querySelector(`.trip-main__trip-controls`);
 const tripControlsElem = tripMainElem.querySelector(`.trip-controls`);
 
+const api = new Api(END_POINT, AUTHORIZATION);
+
+api.getPoints()
+  .then((points) => {
+    pointsModel.setPoints(UpdateType.INIT, points);
+  })
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
+  });;
+
+export const pointsModel = new PointsModel();
+
+const filterModel = new FilterModel();
+
 const siteMenuComponent = new SiteMenuComponent();
-render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
 
 const tripEventsElem = document.querySelector(`.trip-events`);
 
 const tripPresenter = new TripPresenter(tripEventsElem, pointsModel, filterModel);
 const filterPresenter = new FilterPresenter(headerControlsElem, filterModel, pointsModel);
-render(tripMainElem, new RouteComponent(pointsModel.getPoints()).getElement(), RenderPosition.AFTERBEGIN);
 
 const handlePointNewFormClose = () => {
   newPointAdd.disabled = false;
@@ -57,6 +64,8 @@ const handleSiteMenuClick = (menuItem) => {
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
+render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
+
 filterPresenter.init();
 tripPresenter.init();
 
@@ -73,3 +82,5 @@ newPointAdd.addEventListener(`click`, (evt) => {
   siteMenuComponent.setMenuItem(MenuItem.TABLE);
   newPointAdd.disabled = true;
 });
+
+render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);

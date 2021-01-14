@@ -1,12 +1,12 @@
 import {towns, types} from '../const.js';
-import {getOffers} from '../utils/common.js';
 import SmartView from "./smart.js";
-import {points} from '../main.js';
 import dayjs from 'dayjs';
 import flatpickr from "flatpickr";
 
+
 import "flatpickr/dist/flatpickr.min.css";
 import "flatpickr/dist/themes/dark.css";
+import { replace } from '../utils/render.js';
 
 const BLANK_EVENT = {
   "type": `flight`,
@@ -43,15 +43,14 @@ const createDatalistTemplate = (sities) => {
 };
 
 const createOffersMarkup = (offers, isDrawn) => {
+  console.log(offers);
   if (isDrawn) {
     return offers.map((offer) => {
-      const optionArray = offer.title.split(` `);
-      let name = offer.title === `Switch to comfort class`
-        ? optionArray[optionArray.length - 2]
-        : optionArray[optionArray.length - 1];
+      let name = offer.title.toLowerCase().split(` `).join(`-`)
+      offer.isActive = false;
 
       return `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}"${offer.isActive ? `checked` : ``}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${offer.isActive ? `disabled` : ``}>
           <label class="event__offer-label" for="event-offer-${name}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;
@@ -92,7 +91,7 @@ const getButtonMarkup = () => {
 };
 
 const getFormTemplate = (data) => {
-  const {date_from: dateFrom, date_to: dateTo, destination, offers: {offers}, isDrawn, type, price, isDisabled} = data;
+  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(towns);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
@@ -139,7 +138,7 @@ const getFormTemplate = (data) => {
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" required>
+      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" required>
     </div>
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     <button class="event__reset-btn" type="reset">Delete</button>
@@ -149,7 +148,7 @@ const getFormTemplate = (data) => {
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offersMarkup }
+        ${offersMarkup}
       </div>
     </section>
     ${destinationMarkup}
@@ -294,16 +293,30 @@ export default class Form extends SmartView {
   }
 
 
-  _dueTypeToggleHandler({target}) {
-    this.updateData({
-      type: target.value,
-      offers: {
-        type: target.value,
-        offers: getOffers(points, target.value)
-      },
-      isDrawn: true,
-      isDisabled: true
-    });
+  _dueTypeToggleHandler(evt) {
+    // if(evt) {
+      const newOffers = points.slice().find((point) => point.type.toLowerCase() === evt.target.value).offers;
+
+      // for (const offer of newOffers) {
+      //   offer.isActive = false;
+      // }
+          // if(!this.updateData.isDisabled) {
+          //   this.getElement()
+          //   .querySelector(`.event__type-toggle`).setCustomValidity(`Select the type of event`)
+          // } else {
+      this.updateData({
+        type: evt.target.value,
+        offers: {
+          type: evt.target.value,
+          offers: newOffers
+        },
+        isDrawn: true,
+        isDisabled: true
+      });
+   // } else {
+      // this.getElement()
+      //   .querySelector(`.event__type-toggle`).setCustomValidity(`Select the type of event`)
+    // }
   }
 
   _repeatingPlaceholderHandler({target}) {
@@ -345,17 +358,14 @@ export default class Form extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this.updateData({
-      offers: {
-        offers: getOffers(points, BLANK_EVENT.type)
-      }
-    });
-
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
+    // if(!this._data.isDisabled) {
+    //   this.getElement().querySelector(`.event__save-btn`).setAttribute(`disabled`, ``)
+    // }
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
@@ -397,11 +407,17 @@ export default class Form extends SmartView {
   }
 
   _selectOffersHandler(evt) {
-    if (!evt.target.classList.contains(`event__available-offers`)) {
-      let update = this._data.offers.offers.slice();
-      const subString = evt.target.name.split(`-`)[evt.target.name.split(`-`).length - 1];
-      const element = update.find((elem) => elem.title.includes(subString));
+    //if (!evt.target.classList.contains(`event__available-offers`)) {
+      let update = this._data.offers.slice();
+      //console.log(evt.target.name);
+      //console.log(update.title);
+      const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
+      console.log(element.isActive);
+
       element.isActive = !element.isActive;
-    }
+      // this.updateData({
+      //   offers: this._data.offers.slice().find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`))).isActive = !isActive
+      // });
+    //}
   }
 }

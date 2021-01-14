@@ -13,13 +13,13 @@ const createOfferMarkup = ({title, price}) => {
 
 const getPoint = (point) => {
   const {
-    date_from: dateFrom,
-    date_to: dateTo,
-    is_favorite: isFavorite,
+    dateFrom,
+    dateTo,
+    isFavorite,
     destination,
-    offers: {offers = []},
+    offers,
     type,
-    price
+    basePrice
   } = point;
 
   const offersMarkup = offers
@@ -47,7 +47,7 @@ const getPoint = (point) => {
           <p class="event__duration">${day > 0 ? day + `D` : ``} ${hours > 0 ? hours + `H` : ``} ${minute % 60 + `M`}</p>
         </div>
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
