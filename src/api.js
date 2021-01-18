@@ -17,19 +17,27 @@ export default class Api {
   }
 
   getPoints() {
-    return this._load({url: `points`})
-      .then(Api.toJSON)
+    return this._load(
+      {
+        url: `points`
+      })
       .then((points) => points.map(PointsModel.adaptToClient));
   }
 
-  updateTask(task) {
+  getValues(pathValue) {
+    return this._load(
+      {
+        url: pathValue
+      })
+  }
+
+  updatePoint(point) {
     return this._load({
       url: `points/${point.id}`,
       method: Method.PUT,
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
       .then(PointsModel.adaptToClient);;
   }
 
@@ -46,6 +54,7 @@ export default class Api {
         {method, body, headers}
     )
       .then(Api.checkStatus)
+      .then(Api.toJSON)
       .catch(Api.catchError);
   }
 

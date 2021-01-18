@@ -1,8 +1,6 @@
-import {towns, types} from '../const.js';
 import SmartView from "./smart.js";
 import dayjs from 'dayjs';
 import flatpickr from "flatpickr";
-
 
 import "flatpickr/dist/flatpickr.min.css";
 import "flatpickr/dist/themes/dark.css";
@@ -15,9 +13,9 @@ const BLANK_EVENT = {
     "description": ``,
     "pictures": []
   },
-  "date_from": new Date(),
-  "date_to": new Date(),
-  "price": ``,
+  "dateFrom": new Date(),
+  "dateTo": new Date(),
+  "basePrice": ``,
   "offers": {
     "type": `flight`,
     "offers": []
@@ -27,30 +25,30 @@ const BLANK_EVENT = {
 const createTypeMarkup = (tipes) => {
   return tipes
     .map((el) => {
-      const elem = el.toLowerCase();
+      const title = el.type[0].toUpperCase() + el.type.slice(1)
       return `<div class="event__type-item">
-        <input id="event-type-${elem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${elem}">
-       <label class="event__type-label  event__type-label--${elem}" for="event-type-${elem}-1">${el}</label>
+        <input id="event-type-${el.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${el.type}">
+       <label class="event__type-label  event__type-label--${el.type}" for="event-type-${el.type}-1">${title}</label>
       </div>`;
     }).join(`\n`);
 };
 
-const createDatalistTemplate = (sities) => {
-  return sities
-    .map((sity) => {
-      return `<option value="${sity}"></option>`;
+const createDatalistTemplate = (cities) => {
+  return cities
+    .map((city) => {
+      return `<option value="${city.name}"></option>`;
     });
 };
 
 const createOffersMarkup = (offers, isDrawn) => {
   console.log(offers);
+  //const {offers} = types;
   if (isDrawn) {
     return offers.map((offer) => {
       let name = offer.title.toLowerCase().split(` `).join(`-`)
-      offer.isActive = false;
 
       return `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${offer.isActive ? `disabled` : ``}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${offer.isActive ? `checked` : ``}>
           <label class="event__offer-label" for="event-offer-${name}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;
@@ -70,7 +68,7 @@ const createEventPhotosMarkup = (pictures) => {
 };
 
 const getDestinationMarkup = (destination) => {
-  const {description, pictures = []} = destination;
+  const {description, pictures} = destination;
   const eventPhotosMarkup = createEventPhotosMarkup(pictures);
 
   return `<section class="event__section  event__section--destination">
@@ -91,9 +89,10 @@ const getButtonMarkup = () => {
 };
 
 const getFormTemplate = (data) => {
-  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
+  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, cities, types, isDisabled} = data;
+  console.log(offers);
   const transferMarkup = createTypeMarkup(types);
-  const datalistTemplate = createDatalistTemplate(towns);
+  const datalistTemplate = createDatalistTemplate(cities);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const buttonMarkup = getButtonMarkup();
   const destinationMarkup = getDestinationMarkup(destination);
@@ -117,7 +116,7 @@ const getFormTemplate = (data) => {
       <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name || ``}" list="destination-list-1">
       <datalist id="destination-list-1">
         ${datalistTemplate}
       </datalist>
@@ -157,9 +156,9 @@ const getFormTemplate = (data) => {
 };
 
 export default class Form extends SmartView {
-  constructor(point = BLANK_EVENT, isDrawn = false, isDisabled) {
+  constructor(point = BLANK_EVENT, isDrawn, cities, types, isDisabled) {
     super();
-    this._data = Form.parsePointToData(point, isDrawn, isDisabled);
+    this._data = Form.parsePointToData(point, isDrawn, cities, types, isDisabled);
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
@@ -219,12 +218,12 @@ export default class Form extends SmartView {
       this._datepickerFrom = null;
     }
 
-    if (this._data.date_from) {
+    if (this._data.dateFrom) {
       this._datepickerFrom = flatpickr(
           this.getElement().querySelectorAll(`#event-start-time-1`),
           {
             "dateFormat": `d/m/y H:i`,
-            "defaultDate": this._data.date_from,
+            "defaultDate": this._data.dateFrom,
             "enableTime": true,
             "time_24hr": true,
             "onChange": this._dueFromDateChangeHandler
@@ -239,13 +238,13 @@ export default class Form extends SmartView {
       this._datepickerTo = null;
     }
 
-    if (this._data.date_to) {
+    if (this._data.dateTo) {
       this._datepickerTo = flatpickr(
           this.getElement().querySelectorAll(`#event-end-time-1`),
           {
             "dateFormat": `d/m/y H:i`,
-            "defaultDate": this._data.date_to,
-            "minDate": this._data.date_from,
+            "defaultDate": this._data.dateTo,
+            "minDate": this._data.dateFrom,
             "enableTime": true,
             "time_24hr": true,
             "onChange": this._dueToDateChangeHandler
@@ -282,46 +281,32 @@ export default class Form extends SmartView {
 
   _dueFromDateChangeHandler([userDateFrom]) {
     this.updateData({
-      "date_from": userDateFrom
+      dateFrom: userDateFrom
     });
   }
 
   _dueToDateChangeHandler([userDateTo]) {
     this.updateData({
-      "date_to": userDateTo
+      dateTo: userDateTo
     });
   }
 
 
   _dueTypeToggleHandler(evt) {
-    // if(evt) {
-      const newOffers = points.slice().find((point) => point.type.toLowerCase() === evt.target.value).offers;
-
-      // for (const offer of newOffers) {
-      //   offer.isActive = false;
-      // }
-          // if(!this.updateData.isDisabled) {
-          //   this.getElement()
-          //   .querySelector(`.event__type-toggle`).setCustomValidity(`Select the type of event`)
-          // } else {
-      this.updateData({
-        type: evt.target.value,
-        offers: {
-          type: evt.target.value,
-          offers: newOffers
-        },
-        isDrawn: true,
-        isDisabled: true
-      });
-   // } else {
-      // this.getElement()
-      //   .querySelector(`.event__type-toggle`).setCustomValidity(`Select the type of event`)
-    // }
+    const newOffers = this._data.types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
+    console.log(this._data);
+    this.updateData({
+      type: evt.target.value,
+      offers: newOffers,
+      isDrawn: true,
+      isDisabled: true
+    });
+    console.log(this._data);
   }
 
   _repeatingPlaceholderHandler({target}) {
-    const pointName = points.slice().reduce((acc, data) => {
-      acc[data.destination.name] = data.destination;
+    const pointName = this._data.cities.reduce((acc, data) => {
+      acc[data.name] = data;
       return acc;
     }, {});
 
@@ -343,7 +328,7 @@ export default class Form extends SmartView {
   _repeatingPriceHandler({target}) {
     if (Number.isFinite(+target.value)) {
       this.updateData({
-        price: target.value
+        basePrice: target.value
       });
     } else {
       target.setCustomValidity(`The value must be a number`);
@@ -379,12 +364,15 @@ export default class Form extends SmartView {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
-  static parsePointToData(point, isDrawn) {
+  static parsePointToData(point, isDrawn, cities, types) {
     return Object.assign(
         {},
         point,
+
         {
           isDrawn,
+          cities,
+          types,
           isDisabled: false,
         }
     );
@@ -392,6 +380,8 @@ export default class Form extends SmartView {
 
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
+    delete data.cities;
+    delete data.types;
     delete data.isDisabled;
     return data;
   }
@@ -407,17 +397,12 @@ export default class Form extends SmartView {
   }
 
   _selectOffersHandler(evt) {
-    //if (!evt.target.classList.contains(`event__available-offers`)) {
-      let update = this._data.offers.slice();
-      //console.log(evt.target.name);
-      //console.log(update.title);
-      const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
-      console.log(element.isActive);
+    let update = this._data.offers.slice();
+    const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
 
-      element.isActive = !element.isActive;
-      // this.updateData({
-      //   offers: this._data.offers.slice().find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`))).isActive = !isActive
-      // });
-    //}
+    element.isActive = !element.isActive;
+    this.updateData({
+      offers: update
+    });
   }
 }

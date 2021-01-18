@@ -4,16 +4,29 @@ export default class Points extends Observer {
   constructor() {
     super();
     this._points = [];
+    this._cities = [];
+    this._types = [];
   }
 
-  setPoints(updateType, points) {
+  setResponse(updateType, res) {
+    const [points, cities, types] = res;
     this._points = points.slice();
+    this._sities = cities.slice();
+    this._types = types.slice();
 
     this._notify(updateType);
   }
 
   getPoints() {
     return this._points;
+  }
+
+  getCities() {
+    return this._sities;
+  }
+
+  getTypes() {
+    return this._types;
   }
 
   updatePoint(updateType, update) {
@@ -69,7 +82,6 @@ export default class Points extends Observer {
         }
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedPoint.base_price;
     delete adaptedPoint.date_from;
     delete adaptedPoint.date_to;
@@ -84,18 +96,17 @@ export default class Points extends Observer {
         point,
         {
           "base_price": point.basePrice,
-          "date_from": point.dateFrom.toISOString(),
-          "date_to": point.dateTo.toISOString(),
+          "date_from": point.dateFrom,
+          "date_to": point.dateTo,
           "is_favorite": point.isFavorite,
         }
     );
 
-    // Ненужные ключи мы удаляем
-    delete adaptedTask.basePrice;
-    delete adaptedTask.dateFrom;
-    delete adaptedTask.dateTo;
-    delete adaptedTask.isFavorite;
+    delete adaptedPoint.basePrice;
+    delete adaptedPoint.dateFrom;
+    delete adaptedPoint.dateTo;
+    delete adaptedPoint.isFavorite;
 
-    return adaptedTask;
+    return adaptedPoint;
   }
 }

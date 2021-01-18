@@ -1,5 +1,5 @@
 import FormComponent from '../view/form.js';
-import {generateId} from "../mock/point.js";
+import {generateId} from "../utils/task.js";
 import {remove, render, RenderPosition} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
@@ -15,13 +15,16 @@ export default class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(callback) {
+  init(callback, cities, types) {
     this._destroyCallback = callback;
+    this._point;
+    this._cities = cities;
+    this._types = types;
     if (this._formComponent !== null) {
       return;
     }
 
-    this._formComponent = new FormComponent();
+    this._formComponent = new FormComponent(this._point, false, this._cities, this._types);
     this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._formComponent.setDeleteClickHandler(this._handleDeleteClick);
 

@@ -1,5 +1,6 @@
 import AbstractView from "./abstract.js";
 import dayjs from 'dayjs';
+import {castTimeFormat} from '../utils/task.js'
 
 const createOfferMarkup = ({title, price}) => {
   return `
@@ -25,10 +26,12 @@ const getPoint = (point) => {
   const offersMarkup = offers
     .filter((offer) => offer.isActive)
     .map((it) => createOfferMarkup(it)).join(`\n`);
-  const day = dayjs(dateTo).diff(dayjs(dateFrom), `d`);
-  const hours = dayjs(dateTo).diff(dayjs(dateFrom), `h`);
-  const minute = dayjs(dateTo).diff(dayjs(dateFrom), `m`);
 
+  const day = dayjs(dateTo).diff(dayjs(dateFrom), `d`);
+
+  const hours = dayjs(dateTo).diff(dayjs(dateFrom), `h`);
+
+  const minutes = dayjs(dateTo).diff(dayjs(dateFrom), `m`) % 60;
 
   return `<li class="trip-events__item">
       <div class="event">
@@ -44,7 +47,7 @@ const getPoint = (point) => {
             <time class="event__end-time" datetime="${new Date(dateTo)
 }">${dayjs(dateTo).format(`hh:mm`)}</time>
           </p>
-          <p class="event__duration">${day > 0 ? day + `D` : ``} ${hours > 0 ? hours + `H` : ``} ${minute % 60 + `M`}</p>
+          <p class="event__duration">${day > 0 ? day + `D` : ``} ${hours > 0 ? castTimeFormat(hours) + `H` : ``} ${castTimeFormat(minutes) + `M`}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>

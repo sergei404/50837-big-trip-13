@@ -27,8 +27,10 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
-  init(point) {
+  init(point, cities, types) {
     this._point = point;
+    this._cities = cities;
+    this._types = types;
 
     const prevPointComponent = this._pointComponent;
 
@@ -63,7 +65,7 @@ export default class Point {
   }
 
   _replacePointToForm() {
-    this._formComponent = new FormComponent(this._point, true);
+    this._formComponent = new FormComponent(this._point, true, this._cities, this._types);
 
     this._formComponent.setCloseFormClickHandler(this._handleFormClose);
     this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
@@ -118,7 +120,7 @@ export default class Point {
             {},
             this._point,
             {
-              "is_favorite": !this._point[`is_favorite`]
+              isFavorite: !this._point.isFavorite
             }
         )
     );
