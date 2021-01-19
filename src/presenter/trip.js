@@ -118,7 +118,6 @@ export default class Trip {
     }
   }
 
-
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
@@ -144,18 +143,15 @@ export default class Trip {
     render(this._pointContainer, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 
-
-  _renderPoint(point) {
-    // const cities = this._cities;
-    // const types = this._types;
+  _renderPoint(point, cities, types) {
     const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange);
-    pointPresenter.init(point, this._pointsModel.getCities(), this._pointsModel.getTypes());
+    pointPresenter.init(point, cities, types);
     this._pointPresenter[point.id] = pointPresenter;
   }
 
-  _renderPoints(points) {
+  _renderPoints(points, cities, types) {
     points.forEach((point) => {
-      this._renderPoint(point)
+      this._renderPoint(point, cities, types)
     });
   }
 
@@ -193,6 +189,6 @@ export default class Trip {
     }
 
     this._renderSort();
-    this._renderPoints(points, );
+    this._renderPoints(points, this._pointsModel.getCities(), this._pointsModel.getTypes());
   }
 }

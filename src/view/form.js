@@ -4,7 +4,6 @@ import flatpickr from "flatpickr";
 
 import "flatpickr/dist/flatpickr.min.css";
 import "flatpickr/dist/themes/dark.css";
-import { replace } from '../utils/render.js';
 
 const BLANK_EVENT = {
   "type": `flight`,
@@ -41,8 +40,6 @@ const createDatalistTemplate = (cities) => {
 };
 
 const createOffersMarkup = (offers, isDrawn) => {
-  console.log(offers);
-  //const {offers} = types;
   if (isDrawn) {
     return offers.map((offer) => {
       let name = offer.title.toLowerCase().split(` `).join(`-`)
@@ -88,9 +85,10 @@ const getButtonMarkup = () => {
     </button>`;
 };
 
-const getFormTemplate = (data) => {
-  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, cities, types, isDisabled} = data;
-  console.log(offers);
+const getFormTemplate = (data, cities, types) => {
+  console.log(data);
+  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
+  console.log(types);
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(cities);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
@@ -158,7 +156,9 @@ const getFormTemplate = (data) => {
 export default class Form extends SmartView {
   constructor(point = BLANK_EVENT, isDrawn, cities, types, isDisabled) {
     super();
-    this._data = Form.parsePointToData(point, isDrawn, cities, types, isDisabled);
+    this._data = Form.parsePointToData(point, isDrawn, isDisabled);
+    this._cities = cities;
+    this._types = types;
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
@@ -201,7 +201,7 @@ export default class Form extends SmartView {
   }
 
   getTemplate() {
-    return getFormTemplate(this._data);
+    return getFormTemplate(this._data, this._cities, this._types);
   }
 
   restoreHandlers() {
@@ -291,38 +291,33 @@ export default class Form extends SmartView {
     });
   }
 
-
   _dueTypeToggleHandler(evt) {
-    const newOffers = this._data.types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
-    console.log(this._data);
+    const newOffers = this._types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
+
     this.updateData({
       type: evt.target.value,
       offers: newOffers,
       isDrawn: true,
       isDisabled: true
     });
-    console.log(this._data);
   }
 
   _repeatingPlaceholderHandler({target}) {
-    const pointName = this._data.cities.reduce((acc, data) => {
+    const pointName = this._cities.reduce((acc, data) => {
       acc[data.name] = data;
       return acc;
     }, {});
-
+    console.log(this.updateData());
     if (pointName[target.value]) {
       this.updateData({
-        destination: {
-          description: pointName[target.value][`description`],
-          name: target.value,
-          pictures: pointName[target.value][`pictures`]
-        }
+        destination: pointName[target.value]
       });
     } else {
       target.setCustomValidity(`Enter the correct value, one from the list,
         ${Object.keys(pointName)}`);
       return;
     }
+    console.log(this.updateData());
   }
 
   _repeatingPriceHandler({target}) {
@@ -371,8 +366,8 @@ export default class Form extends SmartView {
 
         {
           isDrawn,
-          cities,
-          types,
+          // cities,
+          // types,
           isDisabled: false,
         }
     );
@@ -380,8 +375,8 @@ export default class Form extends SmartView {
 
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
-    delete data.cities;
-    delete data.types;
+    // delete data.cities;
+    // delete data.types;
     delete data.isDisabled;
     return data;
   }

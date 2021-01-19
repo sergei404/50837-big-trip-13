@@ -61,29 +61,6 @@ const api = new Api(END_POINT, AUTHORIZATION);
 
 //console.log(getTowns());
 
-const init = () => {
-  const response = Promise.all([
-    api.getPoints(),
-    api.getValues(`/destinations`),
-    api.getValues(`/offers`),
-  ]);
-
-  return response;
-}
-
-init().then((res) => {
-  pointsModel.setResponse(UpdateType.INIT, res);
-  render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-  render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-})
-.catch(() => {
-  pointsModel.setResponse(UpdateType.INIT, []);
-  render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-  render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-});
-
 const tripEventsElem = document.querySelector(`.trip-events`);
 
 const tripPresenter = new TripPresenter(tripEventsElem, pointsModel, filterModel, api);
@@ -131,3 +108,25 @@ newPointAdd.addEventListener(`click`, (evt) => {
   newPointAdd.disabled = true;
 });
 
+const init = () => {
+  const response = Promise.all([
+    api.getPoints(),
+    api.getValues(`/destinations`),
+    api.getValues(`/offers`),
+  ]);
+
+  return response;
+}
+
+init().then((res) => {
+  pointsModel.setResponse(UpdateType.INIT, res);
+  render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
+  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+  render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
+})
+.catch(() => {
+  pointsModel.setResponse(UpdateType.INIT, []);
+  render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
+  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+  render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
+});

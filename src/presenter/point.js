@@ -64,6 +64,7 @@ export default class Point {
     }
   }
 
+
   _replacePointToForm() {
     this._formComponent = new FormComponent(this._point, true, this._cities, this._types);
 
