@@ -15,11 +15,11 @@ export default class PointNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(callback, cities, types) {
+  init(callback, model) {
     this._destroyCallback = callback;
     this._point;
-    this._cities = cities;
-    this._types = types;
+    this._cities = model.getCities();
+    this._types = model.getTypes();
     if (this._formComponent !== null) {
       return;
     }

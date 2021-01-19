@@ -18,8 +18,6 @@ export default class Trip {
     this._pointPresenter = {};
     this._isLoading = true;
     this._api = api;
-    // this._cities = this._pointsModel.getCities();
-    // this._types = this._pointsModel.getTypes();
 
     this._sortComponent = null;
 
@@ -54,7 +52,7 @@ export default class Trip {
   }
 
   createPoint(callback) {
-    this._pointNewPresenter.init(callback, this._pointsModel.getCities(), this._pointsModel.getTypes());
+    this._pointNewPresenter.init(callback, this._pointsModel);
   }
 
   _getPoints() {
@@ -99,7 +97,7 @@ export default class Trip {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._pointPresenter[data.id].init(data);
+        this._pointPresenter[data.id].init(data, this._pointsModel);
         break;
       case UpdateType.MINOR:
         this._clearBoard();
@@ -143,15 +141,15 @@ export default class Trip {
     render(this._pointContainer, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 
-  _renderPoint(point, cities, types) {
+  _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange);
-    pointPresenter.init(point, cities, types);
+    pointPresenter.init(point, this._pointsModel);
     this._pointPresenter[point.id] = pointPresenter;
   }
 
-  _renderPoints(points, cities, types) {
+  _renderPoints(points) {
     points.forEach((point) => {
-      this._renderPoint(point, cities, types)
+      this._renderPoint(point)
     });
   }
 
@@ -189,6 +187,6 @@ export default class Trip {
     }
 
     this._renderSort();
-    this._renderPoints(points, this._pointsModel.getCities(), this._pointsModel.getTypes());
+    this._renderPoints(points);
   }
 }
