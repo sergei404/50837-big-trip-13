@@ -17,7 +17,6 @@ export default class PointNew {
 
   init(callback, model) {
     this._destroyCallback = callback;
-    this._point;
     this._cities = model.getCities();
     this._types = model.getTypes();
     if (this._formComponent !== null) {

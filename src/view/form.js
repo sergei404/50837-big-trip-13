@@ -24,7 +24,7 @@ const BLANK_EVENT = {
 const createTypeMarkup = (tipes) => {
   return tipes
     .map((el) => {
-      const title = el.type[0].toUpperCase() + el.type.slice(1)
+      const title = el.type[0].toUpperCase() + el.type.slice(1);
       return `<div class="event__type-item">
         <input id="event-type-${el.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${el.type}">
        <label class="event__type-label  event__type-label--${el.type}" for="event-type-${el.type}-1">${title}</label>
@@ -42,7 +42,7 @@ const createDatalistTemplate = (cities) => {
 const createOffersMarkup = (offers, isDrawn) => {
   if (isDrawn) {
     return offers.map((offer) => {
-      let name = offer.title.toLowerCase().split(` `).join(`-`)
+      let name = offer.title.toLowerCase().split(` `).join(`-`);
 
       return `<div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${offer.isActive ? `checked` : ``}>
@@ -86,9 +86,8 @@ const getButtonMarkup = () => {
 };
 
 const getFormTemplate = (data, cities, types) => {
-  console.log(data);
   const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
-  console.log(types);
+
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(cities);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
@@ -307,7 +306,7 @@ export default class Form extends SmartView {
       acc[data.name] = data;
       return acc;
     }, {});
-    console.log(this.updateData());
+
     if (pointName[target.value]) {
       this.updateData({
         destination: pointName[target.value]
@@ -317,7 +316,7 @@ export default class Form extends SmartView {
         ${Object.keys(pointName)}`);
       return;
     }
-    console.log(this.updateData());
+
   }
 
   _repeatingPriceHandler({target}) {
@@ -359,15 +358,12 @@ export default class Form extends SmartView {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
-  static parsePointToData(point, isDrawn, cities, types) {
+  static parsePointToData(point, isDrawn) {
     return Object.assign(
         {},
         point,
-
         {
           isDrawn,
-          // cities,
-          // types,
           isDisabled: false,
         }
     );
@@ -375,8 +371,6 @@ export default class Form extends SmartView {
 
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
-    // delete data.cities;
-    // delete data.types;
     delete data.isDisabled;
     return data;
   }

@@ -18,17 +18,17 @@ export default class Api {
 
   getPoints() {
     return this._load(
-      {
-        url: `points`
-      })
+        {
+          url: `points`
+        })
       .then((points) => points.map(PointsModel.adaptToClient));
   }
 
   getValues(pathValue) {
     return this._load(
-      {
-        url: pathValue
-      })
+        {
+          url: pathValue
+        });
   }
 
   updatePoint(point) {
@@ -38,7 +38,7 @@ export default class Api {
       body: JSON.stringify(PointsModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(PointsModel.adaptToClient);;
+      .then(PointsModel.adaptToClient);
   }
 
   _load({

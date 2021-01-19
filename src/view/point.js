@@ -1,6 +1,6 @@
 import AbstractView from "./abstract.js";
 import dayjs from 'dayjs';
-import {castTimeFormat} from '../utils/task.js'
+import {castTimeFormat} from '../utils/task.js';
 
 const createOfferMarkup = ({title, price}) => {
   return `

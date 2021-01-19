@@ -80,7 +80,7 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        //this._pointsModel.updatePoint(updateType, update);
+        // this._pointsModel.updatePoint(updateType, update);
         this._api.updatePoint(update).then((response) => {
           this._pointsModel.updatePoint(updateType, response);
         });
@@ -149,7 +149,7 @@ export default class Trip {
 
   _renderPoints(points) {
     points.forEach((point) => {
-      this._renderPoint(point)
+      this._renderPoint(point);
     });
   }
 

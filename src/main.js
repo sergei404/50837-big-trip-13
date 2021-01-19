@@ -31,12 +31,12 @@ const api = new Api(END_POINT, AUTHORIZATION);
 //     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 //     render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
 //   })
-  // .catch(() => {
-  //   pointsModel.setPoints(UpdateType.INIT, []);
-  //   render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-  //   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-  //   render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-  // });
+// .catch(() => {
+//   pointsModel.setPoints(UpdateType.INIT, []);
+//   render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
+//   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+//   render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
+// });
 
 // const getTowns = () => {
 //   const towns = [];
@@ -45,7 +45,7 @@ const api = new Api(END_POINT, AUTHORIZATION);
 //     towns = data;
 //   });
 //   return towns;
-//}
+// }
 // const towns = api.getValues(`/destinations`)
 //   .then((data) => {
 //     return data;
@@ -59,7 +59,7 @@ const api = new Api(END_POINT, AUTHORIZATION);
 //   types = data;
 // });
 
-//console.log(getTowns());
+// console.log(getTowns());
 
 const tripEventsElem = document.querySelector(`.trip-events`);
 
@@ -116,7 +116,7 @@ const init = () => {
   ]);
 
   return response;
-}
+};
 
 init().then((res) => {
   pointsModel.setResponse(UpdateType.INIT, res);

@@ -24,7 +24,7 @@ const getTitleMurkup = (points) => {
 const createRouteTemplate = (points) => {
   const titleMurkup = getTitleMurkup(points);
 
-  const costValue = points.reduce((acc, point) => acc + (point.basePrice + point.offers.filter((offer) => offer.isActive == true).reduce((acc2, elem) => acc2 + elem.price, 0)), 0)
+  const costValue = points.reduce((acc, point) => acc + (point.basePrice + point.offers.filter((offer) => !!offer.isActive === true).reduce((acc2, elem) => acc2 + elem.price, 0)), 0);
 
   return (
     `<section class="trip-main__trip-info  trip-info">
