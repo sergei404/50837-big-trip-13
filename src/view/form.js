@@ -39,8 +39,8 @@ const createDatalistTemplate = (cities) => {
     });
 };
 
-const createOffersMarkup = (offers, isDrawn) => {
-  if (isDrawn) {
+const createOffersMarkup = (offers) => {
+  if (offers.length) {
     return offers.map((offer) => {
       let name = offer.title.toLowerCase().split(` `).join(`-`);
 
@@ -86,7 +86,8 @@ const getButtonMarkup = () => {
 };
 
 const getFormTemplate = (data, cities, types) => {
-  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
+  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled, isSaving,
+    isDeleting} = data;
 
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(cities);
@@ -136,9 +137,9 @@ const getFormTemplate = (data, cities, types) => {
       </label>
       <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" required>
     </div>
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
-    ${isDrawn && !isDisabled ? buttonMarkup : ``}
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
+    <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isDeleting ? `Deleting...` : `Delete`}</button>
+    ${isDrawn ? buttonMarkup : ``}
   </header>
   <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -153,9 +154,9 @@ const getFormTemplate = (data, cities, types) => {
 };
 
 export default class Form extends SmartView {
-  constructor(point = BLANK_EVENT, isDrawn, cities, types, isDisabled) {
+  constructor(point = BLANK_EVENT, cities, types, isDrawn) {
     super();
-    this._data = Form.parsePointToData(point, isDrawn, isDisabled);
+    this._data = Form.parsePointToData(point, isDrawn);
     this._cities = cities;
     this._types = types;
     this._datepickerFrom = null;
@@ -269,7 +270,7 @@ export default class Form extends SmartView {
 
     this.getElement()
       .querySelector(`.event__input--price`)
-      .addEventListener(`input`, this._repeatingPriceHandler);
+      .addEventListener(`change`, this._repeatingPriceHandler);
 
     if (this.getElement().querySelector(`.event__details`)) {
       this.getElement()
@@ -296,8 +297,6 @@ export default class Form extends SmartView {
     this.updateData({
       type: evt.target.value,
       offers: newOffers,
-      isDrawn: true,
-      isDisabled: true
     });
   }
 
@@ -322,7 +321,7 @@ export default class Form extends SmartView {
   _repeatingPriceHandler({target}) {
     if (Number.isFinite(+target.value)) {
       this.updateData({
-        basePrice: target.value
+        basePrice: +target.value
       });
     } else {
       target.setCustomValidity(`The value must be a number`);
@@ -337,14 +336,12 @@ export default class Form extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
+
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    // if(!this._data.isDisabled) {
-    //   this.getElement().querySelector(`.event__save-btn`).setAttribute(`disabled`, ``)
-    // }
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
@@ -365,6 +362,8 @@ export default class Form extends SmartView {
         {
           isDrawn,
           isDisabled: false,
+          isSaving: false,
+          isDeleting: false
         }
     );
   }
@@ -372,6 +371,8 @@ export default class Form extends SmartView {
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
     delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
     return data;
   }
 

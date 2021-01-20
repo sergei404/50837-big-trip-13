@@ -9,7 +9,7 @@ import {render, RenderPosition, remove} from './utils/render.js';
 import {MenuItem, UpdateType, FilterType} from "./const.js";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic TjDpyVBdy4dKt9wFzG8Q9By`;
+const AUTHORIZATION = `Basic TjDpyVBdy4dKt9w7FzG8Q9By`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const tripMainElem = document.querySelector(`.trip-main`);
@@ -23,43 +23,6 @@ const filterModel = new FilterModel();
 const siteMenuComponent = new SiteMenuComponent();
 
 const api = new Api(END_POINT, AUTHORIZATION);
-
-// api.getPoints()
-//   .then((points) => {
-//     pointsModel.setPoints(UpdateType.INIT, points);
-//     render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-//     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-//     render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-//   })
-// .catch(() => {
-//   pointsModel.setPoints(UpdateType.INIT, []);
-//   render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-//   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-//   render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-// });
-
-// const getTowns = () => {
-//   const towns = [];
-//   api.getValues(`/destinations`)
-//   .then((data) => {
-//     towns = data;
-//   });
-//   return towns;
-// }
-// const towns = api.getValues(`/destinations`)
-//   .then((data) => {
-//     return data;
-//   });
-
-// console.log(towns);
-
-// let types;
-// api.getValues(`/offers`)
-// .then((data) => {
-//   types = data;
-// });
-
-// console.log(getTowns());
 
 const tripEventsElem = document.querySelector(`.trip-events`);
 

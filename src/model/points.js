@@ -91,6 +91,10 @@ export default class Points extends Observer {
   }
 
   static adaptToServer(point) {
+    if (!point.isDrawn) {
+      point.isFavorite = false;
+    }
+
     const adaptedPoint = Object.assign(
         {},
         point,
@@ -106,6 +110,10 @@ export default class Points extends Observer {
     delete adaptedPoint.dateFrom;
     delete adaptedPoint.dateTo;
     delete adaptedPoint.isFavorite;
+    delete adaptedPoint.isDisabled;
+    delete adaptedPoint.isDrawn;
+    delete adaptedPoint.isDeleting;
+    delete adaptedPoint.isSaving;
 
     return adaptedPoint;
   }

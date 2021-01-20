@@ -13,5 +13,3 @@ export const sortPrice = (prev, next) => {
 export const sotrDays = (prev, next) => {
   return prev.dateFrom - next.dateFrom;
 };
-
-export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
