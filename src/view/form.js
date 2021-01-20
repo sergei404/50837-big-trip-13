@@ -1,7 +1,4 @@
-import {towns, types} from '../const.js';
-import {getOffers} from '../utils/common.js';
 import SmartView from "./smart.js";
-import {points} from '../main.js';
 import dayjs from 'dayjs';
 import flatpickr from "flatpickr";
 
@@ -15,9 +12,9 @@ const BLANK_EVENT = {
     "description": ``,
     "pictures": []
   },
-  "date_from": new Date(),
-  "date_to": new Date(),
-  "price": ``,
+  "dateFrom": new Date(),
+  "dateTo": new Date(),
+  "basePrice": ``,
   "offers": {
     "type": `flight`,
     "offers": []
@@ -27,31 +24,28 @@ const BLANK_EVENT = {
 const createTypeMarkup = (tipes) => {
   return tipes
     .map((el) => {
-      const elem = el.toLowerCase();
+      const title = el.type[0].toUpperCase() + el.type.slice(1);
       return `<div class="event__type-item">
-        <input id="event-type-${elem}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${elem}">
-       <label class="event__type-label  event__type-label--${elem}" for="event-type-${elem}-1">${el}</label>
+        <input id="event-type-${el.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${el.type}">
+       <label class="event__type-label  event__type-label--${el.type}" for="event-type-${el.type}-1">${title}</label>
       </div>`;
     }).join(`\n`);
 };
 
-const createDatalistTemplate = (sities) => {
-  return sities
-    .map((sity) => {
-      return `<option value="${sity}"></option>`;
+const createDatalistTemplate = (cities) => {
+  return cities
+    .map((city) => {
+      return `<option value="${city.name}"></option>`;
     });
 };
 
 const createOffersMarkup = (offers, isDrawn) => {
   if (isDrawn) {
     return offers.map((offer) => {
-      const optionArray = offer.title.split(` `);
-      let name = offer.title === `Switch to comfort class`
-        ? optionArray[optionArray.length - 2]
-        : optionArray[optionArray.length - 1];
+      let name = offer.title.toLowerCase().split(` `).join(`-`);
 
       return `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}"${offer.isActive ? `checked` : ``}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${offer.isActive ? `checked` : ``}>
           <label class="event__offer-label" for="event-offer-${name}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;
@@ -71,7 +65,7 @@ const createEventPhotosMarkup = (pictures) => {
 };
 
 const getDestinationMarkup = (destination) => {
-  const {description, pictures = []} = destination;
+  const {description, pictures} = destination;
   const eventPhotosMarkup = createEventPhotosMarkup(pictures);
 
   return `<section class="event__section  event__section--destination">
@@ -91,10 +85,11 @@ const getButtonMarkup = () => {
     </button>`;
 };
 
-const getFormTemplate = (data) => {
-  const {date_from: dateFrom, date_to: dateTo, destination, offers: {offers}, isDrawn, type, price, isDisabled} = data;
+const getFormTemplate = (data, cities, types) => {
+  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
+
   const transferMarkup = createTypeMarkup(types);
-  const datalistTemplate = createDatalistTemplate(towns);
+  const datalistTemplate = createDatalistTemplate(cities);
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const buttonMarkup = getButtonMarkup();
   const destinationMarkup = getDestinationMarkup(destination);
@@ -118,7 +113,7 @@ const getFormTemplate = (data) => {
       <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name || ``}" list="destination-list-1">
       <datalist id="destination-list-1">
         ${datalistTemplate}
       </datalist>
@@ -139,7 +134,7 @@ const getFormTemplate = (data) => {
         <span class="visually-hidden">Price</span>
         &euro;
       </label>
-      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}" required>
+      <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" required>
     </div>
     <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     <button class="event__reset-btn" type="reset">Delete</button>
@@ -149,7 +144,7 @@ const getFormTemplate = (data) => {
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
-        ${offersMarkup }
+        ${offersMarkup}
       </div>
     </section>
     ${destinationMarkup}
@@ -158,9 +153,11 @@ const getFormTemplate = (data) => {
 };
 
 export default class Form extends SmartView {
-  constructor(point = BLANK_EVENT, isDrawn = false, isDisabled) {
+  constructor(point = BLANK_EVENT, isDrawn, cities, types, isDisabled) {
     super();
     this._data = Form.parsePointToData(point, isDrawn, isDisabled);
+    this._cities = cities;
+    this._types = types;
     this._datepickerFrom = null;
     this._datepickerTo = null;
 
@@ -203,7 +200,7 @@ export default class Form extends SmartView {
   }
 
   getTemplate() {
-    return getFormTemplate(this._data);
+    return getFormTemplate(this._data, this._cities, this._types);
   }
 
   restoreHandlers() {
@@ -220,12 +217,12 @@ export default class Form extends SmartView {
       this._datepickerFrom = null;
     }
 
-    if (this._data.date_from) {
+    if (this._data.dateFrom) {
       this._datepickerFrom = flatpickr(
           this.getElement().querySelectorAll(`#event-start-time-1`),
           {
             "dateFormat": `d/m/y H:i`,
-            "defaultDate": this._data.date_from,
+            "defaultDate": this._data.dateFrom,
             "enableTime": true,
             "time_24hr": true,
             "onChange": this._dueFromDateChangeHandler
@@ -240,13 +237,13 @@ export default class Form extends SmartView {
       this._datepickerTo = null;
     }
 
-    if (this._data.date_to) {
+    if (this._data.dateTo) {
       this._datepickerTo = flatpickr(
           this.getElement().querySelectorAll(`#event-end-time-1`),
           {
             "dateFormat": `d/m/y H:i`,
-            "defaultDate": this._data.date_to,
-            "minDate": this._data.date_from,
+            "defaultDate": this._data.dateTo,
+            "minDate": this._data.dateFrom,
             "enableTime": true,
             "time_24hr": true,
             "onChange": this._dueToDateChangeHandler
@@ -283,54 +280,49 @@ export default class Form extends SmartView {
 
   _dueFromDateChangeHandler([userDateFrom]) {
     this.updateData({
-      "date_from": userDateFrom
+      dateFrom: userDateFrom
     });
   }
 
   _dueToDateChangeHandler([userDateTo]) {
     this.updateData({
-      "date_to": userDateTo
+      dateTo: userDateTo
     });
   }
 
+  _dueTypeToggleHandler(evt) {
+    const newOffers = this._types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
 
-  _dueTypeToggleHandler({target}) {
     this.updateData({
-      type: target.value,
-      offers: {
-        type: target.value,
-        offers: getOffers(points, target.value)
-      },
+      type: evt.target.value,
+      offers: newOffers,
       isDrawn: true,
       isDisabled: true
     });
   }
 
   _repeatingPlaceholderHandler({target}) {
-    const pointName = points.slice().reduce((acc, data) => {
-      acc[data.destination.name] = data.destination;
+    const pointName = this._cities.reduce((acc, data) => {
+      acc[data.name] = data;
       return acc;
     }, {});
 
     if (pointName[target.value]) {
       this.updateData({
-        destination: {
-          description: pointName[target.value][`description`],
-          name: target.value,
-          pictures: pointName[target.value][`pictures`]
-        }
+        destination: pointName[target.value]
       });
     } else {
       target.setCustomValidity(`Enter the correct value, one from the list,
         ${Object.keys(pointName)}`);
       return;
     }
+
   }
 
   _repeatingPriceHandler({target}) {
     if (Number.isFinite(+target.value)) {
       this.updateData({
-        price: target.value
+        basePrice: target.value
       });
     } else {
       target.setCustomValidity(`The value must be a number`);
@@ -345,17 +337,14 @@ export default class Form extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this.updateData({
-      offers: {
-        offers: getOffers(points, BLANK_EVENT.type)
-      }
-    });
-
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
+    // if(!this._data.isDisabled) {
+    //   this.getElement().querySelector(`.event__save-btn`).setAttribute(`disabled`, ``)
+    // }
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
@@ -397,11 +386,12 @@ export default class Form extends SmartView {
   }
 
   _selectOffersHandler(evt) {
-    if (!evt.target.classList.contains(`event__available-offers`)) {
-      let update = this._data.offers.offers.slice();
-      const subString = evt.target.name.split(`-`)[evt.target.name.split(`-`).length - 1];
-      const element = update.find((elem) => elem.title.includes(subString));
-      element.isActive = !element.isActive;
-    }
+    let update = this._data.offers.slice();
+    const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
+
+    element.isActive = !element.isActive;
+    this.updateData({
+      offers: update
+    });
   }
 }

@@ -136,7 +136,6 @@ export default class Statistics extends SmartView {
     const typeCtx = this.getElement().querySelector(`.statistics__chart--transport`);
     const timeSpendCtx = this.getElement().querySelector(`.statistics__chart--time`);
 
-
     const money = new Map(divideCostsByTypes(this._points));
     const type = new Map(divideByTypes(this._points));
     const durations = new Map(divideDurationsByTypes(this._points));

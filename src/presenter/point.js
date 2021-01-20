@@ -18,6 +18,9 @@ export default class Point {
     this._formComponent = null;
     this._mode = Mode.POINT;
 
+    this._cities = null;
+    this._types = null;
+
     this._handlePointClick = this._handlePointClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
@@ -27,8 +30,10 @@ export default class Point {
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
-  init(point) {
+  init(point, model) {
     this._point = point;
+    this._cities = model.getCities();
+    this._types = model.getTypes();
 
     const prevPointComponent = this._pointComponent;
 
@@ -62,8 +67,9 @@ export default class Point {
     }
   }
 
+
   _replacePointToForm() {
-    this._formComponent = new FormComponent(this._point, true);
+    this._formComponent = new FormComponent(this._point, true, this._cities, this._types);
 
     this._formComponent.setCloseFormClickHandler(this._handleFormClose);
     this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
@@ -118,7 +124,7 @@ export default class Point {
             {},
             this._point,
             {
-              "is_favorite": !this._point[`is_favorite`]
+              isFavorite: !this._point.isFavorite
             }
         )
     );
@@ -131,4 +137,9 @@ export default class Point {
         point
     );
   }
+
+  // static getModel(model) {
+  //   this._cities = model.getCities();
+  //   this._types = model.getTypes();
+  // }
 }
