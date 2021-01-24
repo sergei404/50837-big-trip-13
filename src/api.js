@@ -23,6 +23,7 @@ export default class Api {
         {
           url: `points`
         })
+      .then(Api.toJSON)
       .then((points) => points.map(DataModel.adaptToClient));
   }
 
@@ -30,7 +31,8 @@ export default class Api {
     return this._load(
         {
           url: pathValue
-        });
+        })
+        .then(Api.toJSON);
   }
 
   addPoint(point) {
@@ -40,6 +42,7 @@ export default class Api {
       body: JSON.stringify(DataModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
+      .then(Api.toJSON)
       .then(DataModel.adaptToClient);
   }
 
@@ -57,6 +60,7 @@ export default class Api {
       body: JSON.stringify(DataModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
+      .then(Api.toJSON)
       .then(DataModel.adaptToClient);
   }
 
@@ -73,7 +77,6 @@ export default class Api {
         {method, body, headers}
     )
       .then(Api.checkStatus)
-      .then(Api.toJSON)
       .catch(Api.catchError);
   }
 
