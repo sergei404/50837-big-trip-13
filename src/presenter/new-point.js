@@ -54,15 +54,18 @@ export default class PointNew {
   }
 
   setAborting() {
-    const resetFormState = () => {
-      this._formComponent.updateData({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false
-      });
-    };
+    if (this._formComponent) {
+      const resetFormState = () => {
+        this._formComponent.updateData({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        });
+      };
 
-    this._formComponent.shake(resetFormState);
+      this._formComponent.shake(resetFormState);
+    }
+
   }
 
 

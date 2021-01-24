@@ -15,10 +15,7 @@ const BLANK_EVENT = {
   "dateFrom": new Date(),
   "dateTo": new Date(),
   "basePrice": ``,
-  "offers": {
-    "type": `flight`,
-    "offers": []
-  },
+  "offers": []
 };
 
 const createTypeMarkup = (tipes) => {
@@ -102,7 +99,7 @@ const getFormTemplate = (data, cities, types) => {
         <span class="visually-hidden">Choose event type</span>
         <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </label>
-      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+      <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Transfer</legend>
@@ -114,7 +111,7 @@ const getFormTemplate = (data, cities, types) => {
       <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name || ``}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1" required>
       <datalist id="destination-list-1">
         ${datalistTemplate}
       </datalist>
@@ -259,7 +256,7 @@ export default class Form extends SmartView {
       .addEventListener(`change`, this._dueTypeToggleHandler);
 
     this.getElement()
-      .querySelector(`.event__input--destination`)
+      .querySelector(`#event-destination-1`)
       .addEventListener(`change`, this._repeatingPlaceholderHandler);
 
     if (this.getElement().querySelector(`.event__rollup-btn`)) {
@@ -293,29 +290,33 @@ export default class Form extends SmartView {
 
   _dueTypeToggleHandler(evt) {
     const newOffers = this._types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
-
+    //const check = this.element.querySelector(`.event__type-toggle`);
     this.updateData({
       type: evt.target.value,
       offers: newOffers,
     });
   }
 
-  _repeatingPlaceholderHandler({target}) {
+  _repeatingPlaceholderHandler(evt) {
     const pointName = this._cities.reduce((acc, data) => {
       acc[data.name] = data;
       return acc;
     }, {});
 
-    if (pointName[target.value]) {
+    if (pointName[evt.target.value]) {
       this.updateData({
-        destination: pointName[target.value]
+        destination: pointName[evt.target.value]
       });
     } else {
-      target.setCustomValidity(`Enter the correct value, one from the list,
+      evt.target.setCustomValidity(`Enter the correct value, one from the list,
         ${Object.keys(pointName)}`);
       return;
     }
+  }
 
+  setRepeatingPlaceholderHandler(callback) {
+    this._callback.placeholderHandler = callback;
+    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, this._repeatingPlaceholderHandler);
   }
 
   _repeatingPriceHandler({target}) {
