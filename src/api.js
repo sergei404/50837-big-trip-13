@@ -1,4 +1,4 @@
-import PointsModel from "./model/points.js";
+import DataModel from "./model/data.js";
 
 const Method = {
   GET: `GET`,
@@ -23,27 +23,24 @@ export default class Api {
         {
           url: `points`
         })
-      .then(Api.toJSON)
-      .then((points) => points.map(PointsModel.adaptToClient));
+      .then((points) => points.map(DataModel.adaptToClient));
   }
 
   getValues(pathValue) {
     return this._load(
         {
           url: pathValue
-        })
-        .then(Api.toJSON);
+        });
   }
 
   addPoint(point) {
     return this._load({
       url: `points`,
       method: Method.POST,
-      body: JSON.stringify(PointsModel.adaptToServer(point)),
+      body: JSON.stringify(DataModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
-      .then(PointsModel.adaptToClient);
+      .then(DataModel.adaptToClient);
   }
 
   deletePoint(point) {
@@ -57,11 +54,10 @@ export default class Api {
     return this._load({
       url: `points/${point.id}`,
       method: Method.PUT,
-      body: JSON.stringify(PointsModel.adaptToServer(point)),
+      body: JSON.stringify(DataModel.adaptToServer(point)),
       headers: new Headers({"Content-Type": `application/json`})
     })
-      .then(Api.toJSON)
-      .then(PointsModel.adaptToClient);
+      .then(DataModel.adaptToClient);
   }
 
   _load({
@@ -77,6 +73,7 @@ export default class Api {
         {method, body, headers}
     )
       .then(Api.checkStatus)
+      .then(Api.toJSON)
       .catch(Api.catchError);
   }
 

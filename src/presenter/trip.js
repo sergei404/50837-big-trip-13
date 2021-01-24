@@ -10,9 +10,9 @@ import {SortType, UpdateType, UserAction} from "../const.js";
 import {filter} from "../utils/filter.js";
 
 export default class Trip {
-  constructor(pointContainer, pointsModel, filterModel, api) {
+  constructor(pointContainer, dataModel, filterModel, api) {
     this._pointContainer = pointContainer;
-    this._pointsModel = pointsModel;
+    this._dataModel = dataModel;
     this._filterModel = filterModel;
     this._currentSortType = SortType.DAY;
     this._pointPresenter = {};
@@ -36,7 +36,7 @@ export default class Trip {
   init() {
     render(this._pointContainer, this._pointListComponent);
 
-    this._pointsModel.addObserver(this._handleModelEvent);
+    this._dataModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
     this._renderBoard();
@@ -47,17 +47,17 @@ export default class Trip {
 
     remove(this._pointListComponent);
 
-    this._pointsModel.removeObserver(this._handleModelEvent);
+    this._dataModel.removeObserver(this._handleModelEvent);
     this._filterModel.removeObserver(this._handleModelEvent);
   }
 
   createPoint(callback) {
-    this._pointNewPresenter.init(callback, this._pointsModel);
+    this._pointNewPresenter.init(callback, this._dataModel);
   }
 
   _getPoints() {
     const filterType = this._filterModel.getFilter();
-    const points = this._pointsModel.getPoints().slice().sort(sotrDays);
+    const points = this._dataModel.getPoints().slice();
     const filtredPoints = filter[filterType](points);
 
     switch (this._currentSortType) {
@@ -66,7 +66,7 @@ export default class Trip {
       case SortType.PRICE:
         return filtredPoints.sort(sortPrice);
     }
-    return filtredPoints;
+    return filtredPoints.sort(sotrDays);
   }
 
   _handleModeChange() {
@@ -83,7 +83,7 @@ export default class Trip {
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.SAVING);
         this._api.updatePoint(update)
           .then((response) => {
-            this._pointsModel.updatePoint(updateType, response);
+            this._dataModel.updatePoint(updateType, response);
           })
         .catch(() => {
           this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -93,7 +93,7 @@ export default class Trip {
         this._pointNewPresenter.setSaving();
         this._api.addPoint(update)
           .then((response) => {
-            this._pointsModel.addPoint(updateType, response);
+            this._dataModel.addPoint(updateType, response);
           })
           .catch(() => {
             this._pointNewPresenter.setAborting();
@@ -103,7 +103,7 @@ export default class Trip {
         this._pointPresenter[update.id].setViewState(PointPresenterViewState.DELETING);
         this._api.deletePoint(update)
           .then(() => {
-            this._pointsModel.deletePoint(updateType, update);
+            this._dataModel.deletePoint(updateType, update);
           })
           .catch(() => {
             this._pointPresenter[update.id].setViewState(PointPresenterViewState.ABORTING);
@@ -115,7 +115,7 @@ export default class Trip {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._pointPresenter[data.id].init(data, this._pointsModel);
+        this._pointPresenter[data.id].init(data, this._dataModel);
         break;
       case UpdateType.MINOR:
         this._clearBoard();
@@ -161,7 +161,7 @@ export default class Trip {
 
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange);
-    pointPresenter.init(point, this._pointsModel);
+    pointPresenter.init(point, this._dataModel);
     this._pointPresenter[point.id] = pointPresenter;
   }
 

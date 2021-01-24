@@ -1,6 +1,6 @@
 import Observer from "../utils/observer.js";
 
-export default class Points extends Observer {
+export default class Data extends Observer {
   constructor() {
     super();
     this._points = [];
@@ -8,10 +8,19 @@ export default class Points extends Observer {
     this._types = [];
   }
 
-  setResponse(updateType, res) {
-    const [points, cities, types] = res;
+  setPoints(updateType, points) {
     this._points = points.slice();
-    this._sities = cities.slice();
+
+    this._notify(updateType);
+  }
+
+  setCities(updateType, cities) {
+    this._cities = cities.slice();
+
+    this._notify(updateType);
+  }
+
+  setTypes(updateType, types) {
     this._types = types.slice();
 
     this._notify(updateType);
@@ -22,7 +31,7 @@ export default class Points extends Observer {
   }
 
   getCities() {
-    return this._sities;
+    return this._cities;
   }
 
   getTypes() {
@@ -91,10 +100,6 @@ export default class Points extends Observer {
   }
 
   static adaptToServer(point) {
-    if (!point.isDrawn) {
-      point.isFavorite = false;
-    }
-
     const adaptedPoint = Object.assign(
         {},
         point,
@@ -102,7 +107,7 @@ export default class Points extends Observer {
           "base_price": point.basePrice,
           "date_from": point.dateFrom,
           "date_to": point.dateTo,
-          "is_favorite": point.isFavorite,
+          "is_favorite": point.isFavorite || false
         }
     );
 

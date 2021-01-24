@@ -87,27 +87,27 @@ export default class Point {
         isDeleting: false
       });
     };
-
-    switch (state) {
-      case State.SAVING:
-        this._formComponent.updateData({
-          isDisabled: true,
-          isSaving: true
-        });
-        break;
-      case State.DELETING:
-        this._formComponent.updateData({
-          isDisabled: true,
-          isDeleting: true
-        });
-        break;
-      case State.ABORTING:
-        this._pointComponent.shake(resetFormState);
-        this._formComponent.shake(resetFormState);
-        break;
+    if (this._formComponent) {
+      switch (state) {
+        case State.SAVING:
+          this._formComponent.updateData({
+            isDisabled: true,
+            isSaving: true
+          });
+          break;
+        case State.DELETING:
+          this._formComponent.updateData({
+            isDisabled: true,
+            isDeleting: true
+          });
+          break;
+        case State.ABORTING:
+          this._pointComponent.shake(resetFormState);
+          this._formComponent.shake(resetFormState);
+          break;
+      }
     }
   }
-
 
   _replacePointToForm() {
     this._formComponent = new FormComponent(this._point, this._cities, this._types, true);
@@ -144,7 +144,6 @@ export default class Point {
         UpdateType.PATCH,
         point
     );
-    // this._replaceFormToPoint();
   }
 
   _handlePointClick() {
