@@ -119,7 +119,7 @@ export default class Data extends Observer {
     delete adaptedPoint.isDrawn;
     delete adaptedPoint.isDeleting;
     delete adaptedPoint.isSaving;
-    console.log(adaptedPoint);
+
     return adaptedPoint;
   }
 }

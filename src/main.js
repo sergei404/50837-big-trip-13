@@ -85,7 +85,6 @@ newPointAdd.addEventListener(`click`, (evt) => {
 
 api.getPoints()
   .then((points) => {
-    console.log(points);
     dataModel.setPoints(UpdateType.INIT, points);
   })
   .catch(() => {
