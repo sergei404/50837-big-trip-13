@@ -15,10 +15,7 @@ const BLANK_EVENT = {
   "dateFrom": new Date(),
   "dateTo": new Date(),
   "basePrice": ``,
-  "offers": {
-    "type": `flight`,
-    "offers": []
-  },
+  "offers": []
 };
 
 const createTypeMarkup = (tipes) => {
@@ -39,8 +36,8 @@ const createDatalistTemplate = (cities) => {
     });
 };
 
-const createOffersMarkup = (offers, isDrawn) => {
-  if (isDrawn) {
+const createOffersMarkup = (offers) => {
+  if (offers.length) {
     return offers.map((offer) => {
       let name = offer.title.toLowerCase().split(` `).join(`-`);
 
@@ -86,7 +83,8 @@ const getButtonMarkup = () => {
 };
 
 const getFormTemplate = (data, cities, types) => {
-  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled} = data;
+  const {dateFrom, dateTo, destination, type, offers, isDrawn, basePrice, isDisabled, isSaving,
+    isDeleting} = data;
 
   const transferMarkup = createTypeMarkup(types);
   const datalistTemplate = createDatalistTemplate(cities);
@@ -101,7 +99,7 @@ const getFormTemplate = (data, cities, types) => {
         <span class="visually-hidden">Choose event type</span>
         <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </label>
-      <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+      <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
       <div class="event__type-list">
         <fieldset class="event__type-group">
           <legend class="visually-hidden">Transfer</legend>
@@ -113,7 +111,7 @@ const getFormTemplate = (data, cities, types) => {
       <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name || ``}" list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1" required>
       <datalist id="destination-list-1">
         ${datalistTemplate}
       </datalist>
@@ -136,9 +134,9 @@ const getFormTemplate = (data, cities, types) => {
       </label>
       <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" required>
     </div>
-    <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    <button class="event__reset-btn" type="reset">Delete</button>
-    ${isDrawn && !isDisabled ? buttonMarkup : ``}
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
+    <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isDeleting ? `Deleting...` : `Delete`}</button>
+    ${isDrawn ? buttonMarkup : ``}
   </header>
   <section class="event__details">
     <section class="event__section  event__section--offers">
@@ -153,9 +151,9 @@ const getFormTemplate = (data, cities, types) => {
 };
 
 export default class Form extends SmartView {
-  constructor(point = BLANK_EVENT, isDrawn, cities, types, isDisabled) {
+  constructor(point = BLANK_EVENT, cities, types, isDrawn) {
     super();
-    this._data = Form.parsePointToData(point, isDrawn, isDisabled);
+    this._data = Form.parsePointToData(point, isDrawn);
     this._cities = cities;
     this._types = types;
     this._datepickerFrom = null;
@@ -258,7 +256,7 @@ export default class Form extends SmartView {
       .addEventListener(`change`, this._dueTypeToggleHandler);
 
     this.getElement()
-      .querySelector(`.event__input--destination`)
+      .querySelector(`#event-destination-1`)
       .addEventListener(`change`, this._repeatingPlaceholderHandler);
 
     if (this.getElement().querySelector(`.event__rollup-btn`)) {
@@ -269,7 +267,7 @@ export default class Form extends SmartView {
 
     this.getElement()
       .querySelector(`.event__input--price`)
-      .addEventListener(`input`, this._repeatingPriceHandler);
+      .addEventListener(`change`, this._repeatingPriceHandler);
 
     if (this.getElement().querySelector(`.event__details`)) {
       this.getElement()
@@ -292,37 +290,39 @@ export default class Form extends SmartView {
 
   _dueTypeToggleHandler(evt) {
     const newOffers = this._types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
-
+    // const check = this.element.querySelector(`.event__type-toggle`);
     this.updateData({
       type: evt.target.value,
       offers: newOffers,
-      isDrawn: true,
-      isDisabled: true
     });
   }
 
-  _repeatingPlaceholderHandler({target}) {
+  _repeatingPlaceholderHandler(evt) {
     const pointName = this._cities.reduce((acc, data) => {
       acc[data.name] = data;
       return acc;
     }, {});
 
-    if (pointName[target.value]) {
+    if (pointName[evt.target.value]) {
       this.updateData({
-        destination: pointName[target.value]
+        destination: pointName[evt.target.value]
       });
     } else {
-      target.setCustomValidity(`Enter the correct value, one from the list,
+      evt.target.setCustomValidity(`Enter the correct value, one from the list,
         ${Object.keys(pointName)}`);
       return;
     }
+  }
 
+  setRepeatingPlaceholderHandler(callback) {
+    this._callback.placeholderHandler = callback;
+    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, this._repeatingPlaceholderHandler);
   }
 
   _repeatingPriceHandler({target}) {
     if (Number.isFinite(+target.value)) {
       this.updateData({
-        basePrice: target.value
+        basePrice: +target.value
       });
     } else {
       target.setCustomValidity(`The value must be a number`);
@@ -337,14 +337,12 @@ export default class Form extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
+
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
-    // if(!this._data.isDisabled) {
-    //   this.getElement().querySelector(`.event__save-btn`).setAttribute(`disabled`, ``)
-    // }
     this.getElement().addEventListener(`submit`, this._formSubmitHandler);
   }
 
@@ -365,6 +363,8 @@ export default class Form extends SmartView {
         {
           isDrawn,
           isDisabled: false,
+          isSaving: false,
+          isDeleting: false
         }
     );
   }
@@ -372,6 +372,8 @@ export default class Form extends SmartView {
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
     delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
     return data;
   }
 

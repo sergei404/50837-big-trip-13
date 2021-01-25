@@ -1,22 +1,22 @@
-import RouteComponent from './view/route';
+import Route from './view/route';
 import SiteMenuComponent from './view/menu';
 import TripPresenter from './presenter/trip.js';
 import FilterPresenter from "./presenter/filter.js";
-import PointsModel from "./model/points.js";
+import DataModel from "./model/data.js";
 import FilterModel from "./model/filter.js";
 import StatisticsComponent from "./view/statistics.js";
-import {render, RenderPosition, remove} from './utils/render.js';
+import {render, RenderPosition, remove, replace} from './utils/render.js';
 import {MenuItem, UpdateType, FilterType} from "./const.js";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic TjDpyVBdy4dKt9wFzG8Q9By`;
+const AUTHORIZATION = `Basic TjD44pyVBdy4dKt9w7FzG8Q9By`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 
 const tripMainElem = document.querySelector(`.trip-main`);
 const headerControlsElem = tripMainElem.querySelector(`.trip-main__trip-controls`);
 const tripControlsElem = tripMainElem.querySelector(`.trip-controls`);
 
-const pointsModel = new PointsModel();
+const dataModel = new DataModel();
 
 const filterModel = new FilterModel();
 
@@ -24,47 +24,10 @@ const siteMenuComponent = new SiteMenuComponent();
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-// api.getPoints()
-//   .then((points) => {
-//     pointsModel.setPoints(UpdateType.INIT, points);
-//     render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-//     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-//     render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-//   })
-// .catch(() => {
-//   pointsModel.setPoints(UpdateType.INIT, []);
-//   render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-//   siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-//   render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-// });
-
-// const getTowns = () => {
-//   const towns = [];
-//   api.getValues(`/destinations`)
-//   .then((data) => {
-//     towns = data;
-//   });
-//   return towns;
-// }
-// const towns = api.getValues(`/destinations`)
-//   .then((data) => {
-//     return data;
-//   });
-
-// console.log(towns);
-
-// let types;
-// api.getValues(`/offers`)
-// .then((data) => {
-//   types = data;
-// });
-
-// console.log(getTowns());
-
 const tripEventsElem = document.querySelector(`.trip-events`);
 
-const tripPresenter = new TripPresenter(tripEventsElem, pointsModel, filterModel, api);
-const filterPresenter = new FilterPresenter(headerControlsElem, filterModel, pointsModel);
+const tripPresenter = new TripPresenter(tripEventsElem, dataModel, filterModel, api);
+const filterPresenter = new FilterPresenter(headerControlsElem, filterModel, dataModel);
 
 const handlePointNewFormClose = () => {
   newPointAdd.disabled = false;
@@ -83,13 +46,24 @@ const handleSiteMenuClick = (menuItem) => {
       break;
     case MenuItem.STATS:
       tripPresenter.destroy();
-      statisticsComponent = new StatisticsComponent(pointsModel.getPoints());
+      statisticsComponent = new StatisticsComponent(dataModel.getPoints());
       render(tripEventsElem, statisticsComponent);
       siteMenuComponent.getElement().querySelector(`[data-menu-type="${MenuItem.TABLE}"]`).classList.remove(`trip-tabs__btn--active`);
       siteMenuComponent.setMenuItem(MenuItem.STATS);
       break;
   }
 };
+
+let routeComponent = null;
+
+dataModel.addObserver(() => {
+  if (routeComponent) {
+    const currentRoute = new Route(dataModel);
+    replace(currentRoute, routeComponent);
+    remove(routeComponent);
+    routeComponent = currentRoute;
+  }
+});
 
 filterPresenter.init();
 tripPresenter.init();
@@ -108,25 +82,33 @@ newPointAdd.addEventListener(`click`, (evt) => {
   newPointAdd.disabled = true;
 });
 
-const init = () => {
-  const response = Promise.all([
-    api.getPoints(),
-    api.getValues(`/destinations`),
-    api.getValues(`/offers`),
-  ]);
 
-  return response;
-};
+api.getPoints()
+  .then((points) => {
+    dataModel.setPoints(UpdateType.INIT, points);
+  })
+  .catch(() => {
+    dataModel.setPoints(UpdateType.INIT, []);
+  })
+  .finally(() => {
+    routeComponent = new Route(dataModel);
+    render(tripMainElem, routeComponent, RenderPosition.AFTERBEGIN);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+    render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
+  });
 
-init().then((res) => {
-  pointsModel.setResponse(UpdateType.INIT, res);
-  render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-  render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-})
-.catch(() => {
-  pointsModel.setResponse(UpdateType.INIT, []);
-  render(tripMainElem, new RouteComponent(pointsModel.getPoints()), RenderPosition.AFTERBEGIN);
-  siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-  render(tripControlsElem.firstChild, siteMenuComponent.getElement(), RenderPosition.AFTEREND);
-});
+api.getValues(`/destinations`)
+  .then((cities) => {
+    dataModel.setCities(UpdateType.INIT, cities);
+  })
+  .catch(() => {
+    dataModel.setCities(UpdateType.INIT, []);
+  });
+
+api.getValues(`/offers`)
+  .then((types) => {
+    dataModel.setTypes(UpdateType.INIT, types);
+  })
+  .catch(() => {
+    dataModel.setTypes(UpdateType.INIT, []);
+  });

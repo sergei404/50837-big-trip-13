@@ -8,6 +8,12 @@ const Mode = {
   FORM: `FORM`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
+};
+
 export default class Point {
   constructor(pointListContainer, changeData, changeMode) {
     this._pointListContainer = pointListContainer;
@@ -36,6 +42,7 @@ export default class Point {
     this._types = model.getTypes();
 
     const prevPointComponent = this._pointComponent;
+    const prevFormComponent = this._formComponent;
 
     this._pointComponent = new PointComponent(point);
 
@@ -49,6 +56,11 @@ export default class Point {
 
     if (this._mode === Mode.POINT) {
       replace(this._pointComponent, prevPointComponent);
+    }
+
+    if (this._mode === Mode.FORM) {
+      replace(this._pointComponent, prevFormComponent);
+      this._mode = Mode.POINT;
     }
 
     remove(prevPointComponent);
@@ -67,9 +79,38 @@ export default class Point {
     }
   }
 
+  setViewState(state) {
+    const resetFormState = () => {
+      this._formComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+    if (this._formComponent) {
+      switch (state) {
+        case State.SAVING:
+          this._formComponent.updateData({
+            isDisabled: true,
+            isSaving: true
+          });
+          break;
+        case State.DELETING:
+          this._formComponent.updateData({
+            isDisabled: true,
+            isDeleting: true
+          });
+          break;
+        case State.ABORTING:
+          this._pointComponent.shake(resetFormState);
+          this._formComponent.shake(resetFormState);
+          break;
+      }
+    }
+  }
 
   _replacePointToForm() {
-    this._formComponent = new FormComponent(this._point, true, this._cities, this._types);
+    this._formComponent = new FormComponent(this._point, this._cities, this._types, true);
 
     this._formComponent.setCloseFormClickHandler(this._handleFormClose);
     this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
@@ -103,7 +144,6 @@ export default class Point {
         UpdateType.PATCH,
         point
     );
-    this._replaceFormToPoint();
   }
 
   _handlePointClick() {
@@ -137,9 +177,4 @@ export default class Point {
         point
     );
   }
-
-  // static getModel(model) {
-  //   this._cities = model.getCities();
-  //   this._types = model.getTypes();
-  // }
 }

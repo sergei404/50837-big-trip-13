@@ -39,9 +39,9 @@ const createRouteTemplate = (points) => {
 };
 
 export default class Route extends AbstractView {
-  constructor(points) {
+  constructor(model) {
     super();
-    this._points = points;
+    this._points = model.getPoints();
   }
 
   getTemplate() {

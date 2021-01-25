@@ -1,5 +1,4 @@
 import FormComponent from '../view/form.js';
-import {generateId} from "../utils/task.js";
 import {remove, render, RenderPosition} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
@@ -23,7 +22,7 @@ export default class PointNew {
       return;
     }
 
-    this._formComponent = new FormComponent(this._point, false, this._cities, this._types);
+    this._formComponent = new FormComponent(this._point, this._cities, this._types, false);
     this._formComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._formComponent.setDeleteClickHandler(this._handleDeleteClick);
 
@@ -47,11 +46,34 @@ export default class PointNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._formComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    if (this._formComponent) {
+      const resetFormState = () => {
+        this._formComponent.updateData({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        });
+      };
+
+      this._formComponent.shake(resetFormState);
+    }
+
+  }
+
+
   _handleFormSubmit(point) {
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MINOR,
-        Object.assign({id: generateId()}, point)
+        point
     );
     this.destroy();
   }
