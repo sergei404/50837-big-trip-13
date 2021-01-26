@@ -11,10 +11,10 @@
     "test": "npm run eslint"
   },
   "devDependencies": {
-    "css-loader": "^5.0.1",
+    "css-loader": "5.0.1",
     "eslint": "7.13.0",
     "eslint-config-htmlacademy": "0.6.0",
-    "style-loader": "^2.0.0",
+    "style-loader": "2.0.0",
     "webpack": "4.44.2",
     "webpack-cli": "3.3.12",
     "webpack-dev-server": "3.11.0"
@@ -25,7 +25,7 @@
   "dependencies": {
     "chart.js": "2.9.4",
     "chartjs-plugin-datalabels": "0.7.0",
-    "dayjs": "^1.9.7",
-    "flatpickr": "^4.6.7"
+    "dayjs": "1.9.7",
+    "flatpickr": "4.6.7"
   }
 }

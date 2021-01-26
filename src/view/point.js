@@ -29,7 +29,7 @@ const getPoint = (point) => {
 
   const day = dayjs(dateTo).diff(dayjs(dateFrom), `d`);
 
-  const hours = dayjs(dateTo).diff(dayjs(dateFrom), `h`);
+  const hours = dayjs(dateTo).diff(dayjs(dateFrom), `h`) % 24;
 
   const minutes = dayjs(dateTo).diff(dayjs(dateFrom), `m`) % 60;
 
