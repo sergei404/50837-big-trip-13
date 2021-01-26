@@ -39,7 +39,7 @@ const createDatalistTemplate = (cities) => {
 const createOffersMarkup = (offers) => {
   if (offers.length) {
     return offers.map((offer) => {
-      let name = offer.title.toLowerCase().split(` `).join(`-`);
+      const name = offer.title.toLowerCase().split(` `).join(`-`);
 
       return `<div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1" type="checkbox" name="event-offer-${name}" ${offer.isActive ? `checked` : ``}>
@@ -388,7 +388,7 @@ export default class Form extends SmartView {
   }
 
   _selectOffersHandler(evt) {
-    let update = this._data.offers.slice();
+    const update = this._data.offers.slice();
     const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
 
     element.isActive = !element.isActive;

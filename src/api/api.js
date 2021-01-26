@@ -1,4 +1,4 @@
-import DataModel from "./model/data.js";
+import DataModel from "../model/data.js";
 
 const Method = {
   GET: `GET`,
@@ -62,6 +62,16 @@ export default class Api {
     })
       .then(Api.toJSON)
       .then(DataModel.adaptToClient);
+  }
+
+  sync(data) {
+    return this._load({
+      url: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api.toJSON);
   }
 
   _load({
