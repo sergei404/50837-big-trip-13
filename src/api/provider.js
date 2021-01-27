@@ -48,7 +48,7 @@ export default class Provider {
 
   updatePoint(point) {
     if (isOnline()) {
-      return this._api.updateTask(point)
+      return this._api.updatePoint(point)
         .then((updatedPoint) => {
           this._store.setItem(updatedPoint.id, DataModel.adaptToServer(updatedPoint));
           return updatedPoint;
@@ -60,9 +60,9 @@ export default class Provider {
     return Promise.resolve(point);
   }
 
-  addTask(point) {
+  addPoint(point) {
     if (isOnline()) {
-      return this._api.addTask(point)
+      return this._api.addPoint(point)
         .then((newPoint) => {
           this._store.setItem(newPoint.id, DataModel.adaptToServer(newPoint));
           return newPoint;
@@ -72,7 +72,7 @@ export default class Provider {
     return Promise.reject(new Error(`Add point failed`));
   }
 
-  deleteTask(point) {
+  deletePoint(point) {
     if (isOnline()) {
       return this._api.deletePoint(point)
         .then(() => this._store.removeItem(point.id));

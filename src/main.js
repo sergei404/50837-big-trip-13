@@ -14,7 +14,7 @@ import Store from "./api/store.js";
 import Provider from "./api/provider.js";
 
 
-const AUTHORIZATION = `Basic TjD413pyVBdy4dKt9w7FzG8Q9By`;
+const AUTHORIZATION = `Basic TjDpyVBdy42dKt9w7FzG77r4QBy`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip`;
 const STORE_VER = `v13`;
@@ -38,7 +38,6 @@ const apiWithProvider = new Provider(api, store);
 const tripEventsElem = document.querySelector(`.trip-events`);
 
 const tripPresenter = new TripPresenter(tripEventsElem, dataModel, filterModel, apiWithProvider);
-
 const filterPresenter = new FilterPresenter(headerControlsElem, filterModel, dataModel);
 
 const handlePointNewFormClose = () => {
@@ -76,6 +75,7 @@ dataModel.addObserver(() => {
     routeComponent = currentRoute;
   }
 });
+
 
 filterPresenter.init();
 tripPresenter.init();

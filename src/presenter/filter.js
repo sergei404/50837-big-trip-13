@@ -3,10 +3,10 @@ import {render, replace, remove} from "../utils/render.js";
 import {FilterType, UpdateType} from "../const.js";
 
 export default class Filter {
-  constructor(filterContainer, filterModel, pointsModel) {
+  constructor(filterContainer, filterModel, dataModel) {
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
-    this._pointsModel = pointsModel;
+    this._dataModel = dataModel;
     this._currentFilter = null;
 
     this._filterComponent = null;
@@ -14,7 +14,7 @@ export default class Filter {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
 
-    this._pointsModel.addObserver(this._handleModelEvent);
+    this._dataModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
   }
 
@@ -24,7 +24,7 @@ export default class Filter {
     const filters = this._getFilters();
     const prevFilterComponent = this._filterComponent;
 
-    this._filterComponent = new FilterComponent(filters, this._currentFilter);
+    this._filterComponent = new FilterComponent(filters, this._currentFilter, this._dataModel.getPoints());
     this._filterComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -37,6 +37,12 @@ export default class Filter {
   }
 
   _handleModelEvent() {
+    if (this._filterComponent) {
+      const currentFilterComponent = new FilterComponent(this._getFilters(), this._currentFilter, this._dataModel.getPoints());
+      replace(currentFilterComponent, this._filterComponent);
+      this._filterComponent = currentFilterComponent;
+      // remove(currentFilterComponent);
+      }
     this.init();
   }
 
@@ -60,5 +66,9 @@ export default class Filter {
         type: FilterType.PAST,
       }
     ];
+  }
+
+  destroy() {
+    remove(this._filterComponent);
   }
 }
