@@ -42,7 +42,7 @@ export default class Filter {
       replace(currentFilterComponent, this._filterComponent);
       this._filterComponent = currentFilterComponent;
       // remove(currentFilterComponent);
-      }
+    }
     this.init();
   }
 

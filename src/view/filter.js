@@ -9,7 +9,7 @@ const createFilterMarkup = (filter, currentFilterType, points) => {
   return (
     `<div class="trip-filters__filter">
       <input id="filter-${type}" class="trip-filters__filter-input visually-hidden" type="radio" name="trip-filter" value="${type}"
-      ${option ? `disabled` : type === currentFilterType ? `checked` : ``}>
+      ${option ? `disabled` : ``} ${type === currentFilterType ? `checked` : ``}>
       <label class="trip-filters__filter-label" for="filter-${type}">${type}</label>
     </div>`
   );
