@@ -290,7 +290,6 @@ export default class Form extends SmartView {
 
   _dueTypeToggleHandler(evt) {
     const newOffers = this._types.find((elem) => elem.type.toLowerCase() === evt.target.value).offers;
-    // const check = this.element.querySelector(`.event__type-toggle`);
     this.updateData({
       type: evt.target.value,
       offers: newOffers,
