@@ -66,6 +66,7 @@ export default class Trip {
       case SortType.PRICE:
         return filtredPoints.sort(sortPrice);
     }
+
     return filtredPoints.sort(sotrDays);
   }
 

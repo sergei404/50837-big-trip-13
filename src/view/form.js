@@ -303,11 +303,8 @@ export default class Form extends SmartView {
       this.updateData({
         destination: pointName[evt.target.value]
       });
-    } else {
-      evt.target.setCustomValidity(`Enter the correct value, one from the list,
-        ${Object.keys(pointName)}`);
-      return;
     }
+    evt.target.setCustomValidity(`Enter the correct value, one from the list, ${Object.keys(pointName)}`);
   }
 
   _repeatingPriceHandler({target}) {
@@ -315,10 +312,8 @@ export default class Form extends SmartView {
       this.updateData({
         basePrice: +target.value
       });
-    } else {
-      target.setCustomValidity(`The value must be a number`);
-      return;
-    }
+    } 
+    target.setCustomValidity(`The value must be a number`);
   }
 
   _selectOffersHandler(evt) {

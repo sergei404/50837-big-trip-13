@@ -87,7 +87,6 @@ export default class Data extends Observer {
           dateFrom: point.date_from,
           dateTo: point.date_to,
           isFavorite: point.is_favorite,
-
         }
     );
 
@@ -104,6 +103,7 @@ export default class Data extends Observer {
         {},
         point,
         {
+          "id": point.id || ``,
           "base_price": point.basePrice,
           "date_from": point.dateFrom,
           "date_to": point.dateTo,

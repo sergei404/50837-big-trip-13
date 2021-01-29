@@ -11,5 +11,5 @@ export const sortPrice = (prev, next) => {
 };
 
 export const sotrDays = (prev, next) => {
-  return prev.dateFrom - next.dateFrom;
+  return new Date(prev.dateFrom) - new Date(next.dateFrom);
 };
