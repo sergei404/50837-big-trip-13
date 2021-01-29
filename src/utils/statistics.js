@@ -1,24 +1,24 @@
 import dayjs from 'dayjs';
 
 const getTypes = (points) => {
-  return [...new Set(points.map((point) => point.type))]
-}
+  return [...new Set(points.map((point) => point.type))];
+};
 
 const eventsByType = (points, type) => {
   return points.filter((point) => point.type === type);
-}
+};
 
 const getSum = (acc, val) => {
   return acc + val.basePrice;
-}
+};
 
 const getDurations = (acc, val) => {
   return acc + dayjs(val.dateTo).diff(val.dateFrom);
-}
+};
 
 const reduced = (points, reducer) => {
-  return points.reduce(reducer, 0)
-}
+  return points.reduce(reducer, 0);
+};
 
 
 const divideCostsByTypes = (points) => {

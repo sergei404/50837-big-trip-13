@@ -263,7 +263,7 @@ export default class Form extends SmartView {
     });
   }
 
-    _setInnerHandlers() {
+  _setInnerHandlers() {
     const elem = this.getElement();
 
     this._getEventHandler(`.event__type-list`, `change`, this._dueTypeToggleHandler);
@@ -276,13 +276,13 @@ export default class Form extends SmartView {
     this._getEventHandler(`.event__input--price`, `change`, this._repeatingPriceHandler);
 
     if (elem.querySelector(`.event__details`)) {
-      this._getEventHandler(`.event__details`, `change`,  this._selectOffersHandler);
+      this._getEventHandler(`.event__details`, `change`, this._selectOffersHandler);
     }
   }
 
   _getEventHandler(selector, action, callback) {
     this.getElement().querySelector(selector)
-      .addEventListener(action, callback)
+      .addEventListener(action, callback);
   }
 
   _dueTypeToggleHandler(evt) {
