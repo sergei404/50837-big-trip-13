@@ -14,7 +14,7 @@ import Store from "./api/store.js";
 import Provider from "./api/provider.js";
 
 
-const AUTHORIZATION = `Basic TjDpyVBdy42dKt9w7FzG77r4QBy`;
+const AUTHORIZATION = `Basic TjDpyVBdy42dKt9w73FzG77r4QBy`;
 const END_POINT = `https://13.ecmascript.pages.academy/big-trip`;
 const STORE_PREFIX = `big-trip`;
 const STORE_VER = `v13`;
@@ -39,10 +39,6 @@ const tripEventsElem = document.querySelector(`.trip-events`);
 
 const tripPresenter = new TripPresenter(tripEventsElem, dataModel, filterModel, apiWithProvider);
 const filterPresenter = new FilterPresenter(headerControlsElem, filterModel, dataModel);
-
-const handlePointNewFormClose = () => {
-  newPointAdd.disabled = false;
-};
 
 let statisticsComponent = null;
 
@@ -81,6 +77,10 @@ filterPresenter.init();
 tripPresenter.init();
 
 const newPointAdd = document.querySelector(`.trip-main__event-add-btn`);
+
+const handlePointNewFormClose = () => {
+  newPointAdd.disabled = false;
+};
 
 newPointAdd.addEventListener(`click`, (evt) => {
   evt.preventDefault();

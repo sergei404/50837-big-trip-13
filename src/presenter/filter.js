@@ -41,7 +41,6 @@ export default class Filter {
       const currentFilterComponent = new FilterComponent(this._getFilters(), this._currentFilter, this._dataModel.getPoints());
       replace(currentFilterComponent, this._filterComponent);
       this._filterComponent = currentFilterComponent;
-      // remove(currentFilterComponent);
     }
     this.init();
   }
@@ -66,9 +65,5 @@ export default class Filter {
         type: FilterType.PAST,
       }
     ];
-  }
-
-  destroy() {
-    remove(this._filterComponent);
   }
 }

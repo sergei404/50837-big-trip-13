@@ -91,6 +91,7 @@ const getFormTemplate = (data, cities, types) => {
   const offersMarkup = createOffersMarkup(offers, isDrawn);
   const buttonMarkup = getButtonMarkup();
   const destinationMarkup = getDestinationMarkup(destination);
+  const cancelOrDelete = isDrawn ? `Delete` : `Cancel`;
 
   return `<form class="event event--edit" action="#" method="post">
   <header class="event__header">
@@ -135,7 +136,7 @@ const getFormTemplate = (data, cities, types) => {
       <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" required>
     </div>
     <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>${isSaving ? `Saving...` : `Save`}</button>
-    <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isDeleting ? `Deleting...` : `Delete`}</button>
+    <button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>${isDeleting ? `Deleting...` : cancelOrDelete}</button>
     ${isDrawn ? buttonMarkup : ``}
   </header>
   <section class="event__details">
@@ -250,32 +251,6 @@ export default class Form extends SmartView {
     }
   }
 
-  _setInnerHandlers() {
-    this.getElement()
-      .querySelector(`.event__type-list`)
-      .addEventListener(`change`, this._dueTypeToggleHandler);
-
-    this.getElement()
-      .querySelector(`#event-destination-1`)
-      .addEventListener(`change`, this._repeatingPlaceholderHandler);
-
-    if (this.getElement().querySelector(`.event__rollup-btn`)) {
-      this.getElement()
-        .querySelector(`.event__rollup-btn`)
-        .addEventListener(`click`, this._formCloseClickHandler);
-    }
-
-    this.getElement()
-      .querySelector(`.event__input--price`)
-      .addEventListener(`change`, this._repeatingPriceHandler);
-
-    if (this.getElement().querySelector(`.event__details`)) {
-      this.getElement()
-        .querySelector(`.event__details`)
-        .addEventListener(`change`, this._selectOffersHandler);
-    }
-  }
-
   _dueFromDateChangeHandler([userDateFrom]) {
     this.updateData({
       dateFrom: userDateFrom
@@ -286,6 +261,28 @@ export default class Form extends SmartView {
     this.updateData({
       dateTo: userDateTo
     });
+  }
+
+    _setInnerHandlers() {
+    const elem = this.getElement();
+
+    this._getEventHandler(`.event__type-list`, `change`, this._dueTypeToggleHandler);
+    this._getEventHandler(`#event-destination-1`, `change`, this._repeatingPlaceholderHandler);
+
+    if (elem.querySelector(`.event__rollup-btn`)) {
+      this._getEventHandler(`.event__rollup-btn`, `click`, this._formCloseClickHandler);
+    }
+
+    this._getEventHandler(`.event__input--price`, `change`, this._repeatingPriceHandler);
+
+    if (elem.querySelector(`.event__details`)) {
+      this._getEventHandler(`.event__details`, `change`,  this._selectOffersHandler);
+    }
+  }
+
+  _getEventHandler(selector, action, callback) {
+    this.getElement().querySelector(selector)
+      .addEventListener(action, callback)
   }
 
   _dueTypeToggleHandler(evt) {
@@ -313,11 +310,6 @@ export default class Form extends SmartView {
     }
   }
 
-  setRepeatingPlaceholderHandler(callback) {
-    this._callback.placeholderHandler = callback;
-    this.getElement().querySelector(`#event-destination-1`).addEventListener(`change`, this._repeatingPlaceholderHandler);
-  }
-
   _repeatingPriceHandler({target}) {
     if (Number.isFinite(+target.value)) {
       this.updateData({
@@ -329,14 +321,18 @@ export default class Form extends SmartView {
     }
   }
 
-  setRepeatingPlaceholderPriceHandler(callback) {
-    this._callback.priceHandler = callback;
-    this.getElement().querySelector(`#event-price-1`).addEventListener(`change`, this._repeatingPriceHandler);
+  _selectOffersHandler(evt) {
+    const update = this._data.offers.slice();
+    const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
+
+    element.isActive = !element.isActive;
+    this.updateData({
+      offers: update
+    });
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-
     this._callback.formSubmit(Form.parsePointToData(this._data));
   }
 
@@ -355,27 +351,6 @@ export default class Form extends SmartView {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._formDeleteClickHandler);
   }
 
-  static parsePointToData(point, isDrawn) {
-    return Object.assign(
-        {},
-        point,
-        {
-          isDrawn,
-          isDisabled: false,
-          isSaving: false,
-          isDeleting: false
-        }
-    );
-  }
-
-  static parseDataToPoint(data) {
-    data = Object.assign({}, data);
-    delete data.isDisabled;
-    delete data.isSaving;
-    delete data.isDeleting;
-    return data;
-  }
-
   _formCloseClickHandler() {
     this._callback.formClick();
     this.removeElement();
@@ -386,13 +361,25 @@ export default class Form extends SmartView {
     this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._formCloseClickHandler);
   }
 
-  _selectOffersHandler(evt) {
-    const update = this._data.offers.slice();
-    const element = update.find((elem) => evt.target.name.includes(elem.title.toLowerCase().split(` `).join(`-`)));
+  static parsePointToData(point, isDrawn) {
+    return Object.assign(
+        {},
+        point,
+        {
+          isDrawn,
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false,
+          offers: JSON.parse(JSON.stringify(point.offers))
+        }
+    );
+  }
 
-    element.isActive = !element.isActive;
-    this.updateData({
-      offers: update
-    });
+  static parseDataToPoint(data) {
+    data = Object.assign({}, data);
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+    return data;
   }
 }

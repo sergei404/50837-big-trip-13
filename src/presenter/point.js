@@ -66,6 +66,7 @@ export default class Point {
     }
 
     remove(prevPointComponent);
+    remove(prevFormComponent);
   }
 
   destroy() {
@@ -163,6 +164,7 @@ export default class Point {
   }
 
   _handleFormClose() {
+    console.log();
     this._formComponent.reset(this._point);
     this._replaceFormToPoint();
     this._formComponent.removeElement();

@@ -52,6 +52,7 @@ export default class Trip {
   }
 
   createPoint(callback) {
+    console.log();
     this._pointNewPresenter.init(callback, this._dataModel);
   }
 

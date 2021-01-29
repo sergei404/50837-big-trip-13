@@ -65,9 +65,7 @@ export default class PointNew {
 
       this._formComponent.shake(resetFormState);
     }
-
   }
-
 
   _handleFormSubmit(point) {
     this._changeData(

@@ -1,28 +1,42 @@
 import dayjs from 'dayjs';
 
-const divideCostsByTypes = (points) => {
+const getTypes = (points) => {
   return [...new Set(points.map((point) => point.type))]
-    .map((type) => {
-      const eventsByType = points.filter((point) => point.type === type);
-      const sum = eventsByType.reduce((acc, val) => (acc + val.basePrice), 0);
-      return [type, sum];
-    })
-      .sort(([, priceA], [, priceB]) => priceB - priceA);
+}
+
+const eventsByType = (points, type) => {
+  return points.filter((point) => point.type === type);
+}
+
+const getSum = (acc, val) => {
+  return acc + val.basePrice;
+}
+
+const getDurations = (acc, val) => {
+  return acc + dayjs(val.dateTo).diff(val.dateFrom);
+}
+
+const reduced = (points, reducer) => {
+  return points.reduce(reducer, 0)
+}
+
+
+const divideCostsByTypes = (points) => {
+  return getTypes(points)
+    .map((type) => [type, reduced(eventsByType(points, type), getSum)])
+    .sort(([, priceA], [, priceB]) => priceB - priceA);
 };
 
 const divideByTypes = (points) => {
-  return [...new Set(points.map((point) => point.type))]
-    .map((type) => {
-      return [type, points.filter((point) => point.type === type).length];
-    })
+  return getTypes(points)
+    .map((type) => [type, eventsByType(points, type).length])
     .sort(([, countA], [, countB]) => countB - countA);
 };
 
 const divideDurationsByTypes = (points) => {
-  return [...new Set(points.map((point) => point.type))]
+  return getTypes(points)
     .map((type) => {
-      const eventsByType = points.filter((point) => point.type === type);
-      const sum = eventsByType.reduce((acc, val) => (acc + dayjs(val.dateTo).diff(val.dateFrom)), 0);
+      const sum = reduced(eventsByType(points, type), getDurations);
       return [type, dayjs(sum).hour()];
     })
     .sort(([, durationA], [, durationB]) => durationB - durationA);

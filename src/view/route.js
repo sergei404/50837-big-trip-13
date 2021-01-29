@@ -6,13 +6,15 @@ const getTitleMurkup = (points) => {
     const towns = [...new Set(points.slice().map((point) => point.destination.name))];
 
     const data = Object.entries(points.slice().reduce((acc, point) => {
-      const key = `${new Date(point.dateFrom).getMonth() + 1} ${new Date(point.dateFrom).getDate()}`;
+      const month = new Date(point.dateFrom).getMonth() + 1;
+      const date = new Date(point.dateFrom).getDate();
+      const key = `${month} ${date}`;
       acc[key] = new Date(point.dateFrom);
       return acc;
     }, {})).sort((prev, next) => prev[1] - next[1]);
 
-    const dateStart = data[0];
-    const dateEnd = data[data.length - 1];
+    const [dateStart] = data;
+    const [, dateEnd] = data;
 
     return `<h1 class="trip-info__title">${towns.length >= 3 ? `${towns[0]} &mdash; ... &mdash; ${towns[towns.length - 1]}` : `${towns.join(` &mdash; `)}`}</h1>
     <p class="trip-info__dates">${dayjs(dateStart[1]).format(`MMM D`)} &nbsp;&mdash;&nbsp; ${dateStart[1].getMonth() === dateEnd[1].getMonth() ? dayjs(dateEnd[1]).format(`D`) : dayjs(dateEnd[1]).format(`MMM D`)}</p>`;
