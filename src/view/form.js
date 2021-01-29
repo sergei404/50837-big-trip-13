@@ -312,7 +312,7 @@ export default class Form extends SmartView {
       this.updateData({
         basePrice: +target.value
       });
-    } 
+    }
     target.setCustomValidity(`The value must be a number`);
   }
 
